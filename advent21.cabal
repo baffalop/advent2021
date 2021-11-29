@@ -1,0 +1,60 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.3.
+--
+-- see: https://github.com/sol/hpack
+
+name:           advent21
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/baffalop/advent21#readme>
+homepage:       https://github.com/baffalop/advent21#readme
+bug-reports:    https://github.com/baffalop/advent21/issues
+author:         Nikita Gaidakov
+maintainer:     nikita.gaidakov@gmail.com
+copyright:      2021 Nikita Gaidakov
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/baffalop/advent21
+
+library
+  exposed-modules:
+      Lib
+  other-modules:
+      Paths_advent21
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010
+
+executable advent21-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_advent21
+  hs-source-dirs:
+      app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      advent21
+    , base >=4.7 && <5
+  default-language: Haskell2010
+
+test-suite advent21-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_advent21
+  hs-source-dirs:
+      test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      advent21
+    , base >=4.7 && <5
+  default-language: Haskell2010
