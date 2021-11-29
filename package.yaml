@@ -20,7 +20,7 @@ description:         Solutions to Advent of Code 2021 in Haskell
 
 dependencies:
 - base >= 4.7 && < 5
-
+  
 library:
   source-dirs: src
 
@@ -29,6 +29,7 @@ executables:
     main:                Main.hs
     source-dirs:         app
     ghc-options:
+    - -Wall
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
