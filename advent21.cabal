@@ -6,7 +6,7 @@ cabal-version: 1.12
 
 name:           advent21
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/baffalop/advent21#readme>
+description:    Solutions to Advent of Code 2021 in Haskell
 homepage:       https://github.com/baffalop/advent21#readme
 bug-reports:    https://github.com/baffalop/advent21/issues
 author:         Nikita Gaidakov
@@ -17,7 +17,6 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git
@@ -32,6 +31,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , optparse-applicative
   default-language: Haskell2010
 
 executable advent21-exe
@@ -40,10 +40,11 @@ executable advent21-exe
       Paths_advent21
   hs-source-dirs:
       app
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       advent21
     , base >=4.7 && <5
+    , optparse-applicative
   default-language: Haskell2010
 
 test-suite advent21-test
@@ -57,4 +58,5 @@ test-suite advent21-test
   build-depends:
       advent21
     , base >=4.7 && <5
+    , optparse-applicative
   default-language: Haskell2010
