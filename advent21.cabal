@@ -23,6 +23,8 @@ source-repository head
   location: https://github.com/baffalop/advent21
 
 library
+  exposed-modules:
+      Lib.Utils
   other-modules:
       Paths_advent21
   hs-source-dirs:

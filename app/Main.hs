@@ -5,6 +5,7 @@ import Data.Maybe (catMaybes)
 import Options.Applicative (help, long, metavar, short)
 import qualified Options.Applicative as Opt
 import Text.Read (readMaybe)
+import Lib.Utils (maybeIf)
 
 data Options = Options
   { day :: Int
@@ -52,7 +53,3 @@ dayNumberOpt bound =
 buildDayPart :: Bool -> Bool -> [DayPart]
 buildDayPart False False = [PartA, PartB]
 buildDayPart a b = catMaybes [maybeIf a PartA, maybeIf b PartB]
-
-maybeIf :: Bool -> a -> Maybe a
-maybeIf True x = Just x
-maybeIf False _ = Nothing
