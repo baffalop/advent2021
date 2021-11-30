@@ -10,7 +10,6 @@ import Lib.Utils (maybeIf)
 data Options = Options
   { day :: Int
   , parts :: [DayPart]
-  , input :: Maybe String
   }
   deriving (Show)
 
@@ -36,9 +35,6 @@ opts =
     <*> (buildDayPart
       <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
-    <*> (Opt.optional $ Opt.strOption $
-      long "input" <> short 'i' <> metavar "FILE" <> help "Override file to use as puzzle's input")
-
 
 dayNumberOpt :: Int -> Opt.ReadM Int
 dayNumberOpt bound =
