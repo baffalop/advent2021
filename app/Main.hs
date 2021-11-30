@@ -29,13 +29,14 @@ cli =
     <> Opt.progDesc "Run solution(s) for the AoC puzzle of the given day"
 
 opts :: Opt.Parser Options
-opts = Options
-  <$> (Opt.option (dayNumberOpt 25) $ short 'd' <> long "day" <> metavar "N" <> help "Which day's solution to run")
-  <*> (buildDayPart
-    <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
-    <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
-  <*> (Opt.optional $ Opt.strOption $
-    long "input" <> short 'i' <> metavar "FILE" <> help "Override file to use as puzzle's input")
+opts =
+  Options
+    <$> (Opt.option (dayNumberOpt 25) $ short 'd' <> long "day" <> metavar "N" <> help "Which day's solution to run")
+    <*> (buildDayPart
+      <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
+      <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
+    <*> (Opt.optional $ Opt.strOption $
+      long "input" <> short 'i' <> metavar "FILE" <> help "Override file to use as puzzle's input")
 
 
 buildDayPart :: Bool -> Bool -> DayPart
