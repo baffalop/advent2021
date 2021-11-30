@@ -19,7 +19,9 @@ data DayPart
   deriving (Show, Read)
 
 main :: IO ()
-main = Opt.execParser cli >>= print
+main = do
+  options <- Opt.execParser cli
+  print options
 
 cli :: Opt.ParserInfo Options
 cli =
