@@ -1,21 +1,19 @@
 module Main where
     
 import Data.Either.Extra (maybeToEither)
+import Data.Maybe (catMaybes)
 import Options.Applicative (help, long, metavar, short)
 import qualified Options.Applicative as Opt
 import Text.Read (readMaybe)
 
 data Options = Options
   { day :: Int
-  , part :: DayPart
+  , parts :: [DayPart]
   , input :: Maybe String
   }
   deriving (Show)
 
-data DayPart
-  = PartA
-  | PartB
-  | BothParts
+data DayPart = PartA | PartB
   deriving (Show, Read)
 
 main :: IO ()
@@ -41,11 +39,6 @@ opts =
       long "input" <> short 'i' <> metavar "FILE" <> help "Override file to use as puzzle's input")
 
 
-buildDayPart :: Bool -> Bool -> DayPart
-buildDayPart True False = PartA
-buildDayPart False True = PartB
-buildDayPart _ _ = BothParts
-
 dayNumberOpt :: Int -> Opt.ReadM Int
 dayNumberOpt bound =
   Opt.eitherReader $ \s -> do
@@ -55,3 +48,11 @@ dayNumberOpt bound =
       else Right n
   where
     errorMessage = "There are " <> show bound <> " days of Christmas. Please specify one of them."
+    
+buildDayPart :: Bool -> Bool -> [DayPart]
+buildDayPart False False = [PartA, PartB]
+buildDayPart a b = catMaybes [maybeIf a PartA, maybeIf b PartB]
+
+maybeIf :: Bool -> a -> Maybe a
+maybeIf True x = Just x
+maybeIf False _ = Nothing
