@@ -3,7 +3,14 @@
 # For more information, please see the documentation at:
 #   https://docs.haskellstack.org/en/stable/lock_files
 
-packages: []
+packages:
+- completed:
+    hackage: advent-of-code-api-0.2.8.0@sha256:37f277d71f846f78f393eef786e1834648d7de951a8061aefa8b06e1aa5e0aa7,2351
+    pantry-tree:
+      size: 1185
+      sha256: 9f2e833e9127ca801d94b520bf63189a828ea2ae571fe8bb2922909efa98fabb
+  original:
+    hackage: advent-of-code-api-0.2.8.0
 snapshots:
 - completed:
     size: 586296
