@@ -13,11 +13,13 @@ import Lib.Utils (maybeIf)
 import qualified Day1.Solution as Day1
 
 data Options = Options
-  { day :: Int
+  { day :: Day
   , parts :: [DayPart]
   , key :: SessionKey
   }
   deriving (Show)
+
+type Day = Int
 
 data DayPart = PartA | PartB
   deriving (Eq, Show)
@@ -70,7 +72,7 @@ opts =
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
     <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
 
-dayNumberOpt :: Int -> Opt.ReadM Int
+dayNumberOpt :: Int -> Opt.ReadM Day
 dayNumberOpt bound =
   Opt.eitherReader $ \s -> do
     n <- maybeToEither errorMessage $ readMaybe s
