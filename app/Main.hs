@@ -15,11 +15,17 @@ import qualified Day1.Solution as Day1
 data Options = Options
   { day :: Int
   , parts :: [DayPart]
+  , key :: SessionKey
   }
   deriving (Show)
 
 data DayPart = PartA | PartB
   deriving (Eq, Show)
+
+newtype SessionKey = Key String
+
+instance Show SessionKey where
+  show (Key k) = k
 
 data Solution r a = Solution
   { parse :: String -> r
@@ -29,7 +35,8 @@ data Solution r a = Solution
 
 main :: IO ()
 main = do
-  Options{ day, parts } <- Opt.execParser cli
+  Options{ day, parts, key } <- Opt.execParser cli
+  putStrLn $ "Running with key " <> show key
   input <- getContents
   when (length input < 20) $
     error "Input is suspiciously small. Are you sure you piped the right thing?"
@@ -61,6 +68,7 @@ opts =
     <*> (buildDayPart
       <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
+    <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
 
 dayNumberOpt :: Int -> Opt.ReadM Int
 dayNumberOpt bound =
