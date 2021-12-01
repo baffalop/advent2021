@@ -2,12 +2,13 @@ module Day1.Solution (parse, solveA, solveB) where
 
 import Data.List (tails)
 import Data.List.Extra (dropEnd)
+import Lib.Utils (withConsecutive)
     
 parse :: String -> [Int]
 parse = fmap read . lines
 
 solveA :: [Int] -> Int
-solveA ns = length $ filter (< 0) $ zipWith (-) ns $ tail ns
+solveA = length . filter (< 0) . withConsecutive (-)
 
 solveB :: [Int] -> Int
 solveB = solveA . fmap sum . rollingWindows 3
