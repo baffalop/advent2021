@@ -10,7 +10,7 @@ import Text.Read (readMaybe)
 import Lib.Utils (maybeIf)
 import Control.Monad (when)
 
-import qualified Day1.Main as Day1
+import qualified Day1.Solution as Day1
 
 data Options = Options
   { day :: Int
