@@ -2,14 +2,14 @@
 
 module Main where
     
+import Control.Monad (when)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
 import Options.Applicative (help, long, metavar, short)
-import qualified Options.Applicative as Opt
 import Text.Read (readMaybe)
-import Lib.Utils (maybeIf)
-import Control.Monad (when)
+import qualified Options.Applicative as Opt
 
+import Lib.Utils (maybeIf)
 import qualified Day1.Solution as Day1
 
 data Options = Options
