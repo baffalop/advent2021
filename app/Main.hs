@@ -1,4 +1,4 @@
-{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE NamedFieldPuns, LambdaCase #-}
 
 module Main where
     
@@ -6,6 +6,7 @@ import Control.Monad (when)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
 import Options.Applicative (help, long, metavar, short)
+import System.Directory.Extra (doesFileExist)
 import Text.Read (readMaybe)
 import qualified Options.Applicative as Opt
 
@@ -37,9 +38,9 @@ data Solution r a = Solution
 
 main :: IO ()
 main = do
-  Options{ day, parts, key } <- Opt.execParser cli
-  putStrLn $ "Running with key " <> show key
-  input <- getContents
+  options@Options{ day, parts } <- Opt.execParser cli
+
+  input <- fetchInput options
   when (length input < 20) $
     error "Input is suspiciously small. Are you sure you piped the right thing?"
 
@@ -71,6 +72,25 @@ opts =
       <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
     <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
+
+fetchInput :: Options -> IO String
+fetchInput Options{ day, key } = do
+  let inputFilePath = inputPathFor day
+  inputFileExists <- doesFileExist inputFilePath
+  if inputFileExists
+    then do
+      putStrLn $ "Reading input from file: " <> inputFilePath
+      readFile inputFilePath
+    else do
+      putStrLn $ "File does not exist: " <> inputFilePath
+      putStrLn "Fetching from API"
+      fetchInputFromApi day key
+
+inputPathFor :: Day -> FilePath
+inputPathFor day = "inputs/Day" <> show day <> ".txt"
+
+fetchInputFromApi :: Day -> SessionKey -> IO String
+fetchInputFromApi day key = error "not implemented"
 
 dayNumberOpt :: Int -> Opt.ReadM Day
 dayNumberOpt bound =
