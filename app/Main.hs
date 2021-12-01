@@ -1,3 +1,5 @@
+{-# LANGUAGE NamedFieldPuns #-}
+
 module Main where
     
 import Data.Either.Extra (maybeToEither)
@@ -6,6 +8,9 @@ import Options.Applicative (help, long, metavar, short)
 import qualified Options.Applicative as Opt
 import Text.Read (readMaybe)
 import Lib.Utils (maybeIf)
+import Control.Monad (when)
+
+import qualified Day1.Main as Day1
 
 data Options = Options
   { day :: Int
@@ -14,12 +19,33 @@ data Options = Options
   deriving (Show)
 
 data DayPart = PartA | PartB
-  deriving (Show, Read)
+  deriving (Eq, Show)
+
+data Solution r a = Solution
+  { parse :: String -> r
+  , solveA :: r -> a
+  , solveB :: r -> a
+  }
 
 main :: IO ()
 main = do
-  options <- Opt.execParser cli
-  print options
+  Options{ day, parts } <- Opt.execParser cli
+  input <- getContents
+  when (length input < 20) $
+    error "Input is suspiciously small. Are you sure you piped the right thing?"
+
+  let Solution{ parse, solveA, solveB } = case day of
+        1 -> Solution Day1.parse Day1.solveA Day1.solveB
+        _ -> error $ "Have not solved for Day " <> show day <> " yet"
+
+  let parsed = parse input
+  when (PartA `elem` parts) $ putStrLn $ "Part A: " <> show (solveA parsed)
+  when (PartB `elem` parts) $ putStrLn $ "Part B: " <> show (solveB parsed)
+
+-- solutionForDay :: Show a => Int -> Solution r a
+-- solutionForDay n = case n of
+--   1 -> Solution Day1.parse Day1.solveA Day1.solveB
+--   _ -> error $ "Have not solved for Day " <> show n <> " yet"
 
 cli :: Opt.ParserInfo Options
 cli =
