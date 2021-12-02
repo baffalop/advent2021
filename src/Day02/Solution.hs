@@ -1,6 +1,6 @@
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Day2.Solution (parse, solveA, solveB) where
+module Day02.Solution (parse, solveA, solveB) where
 
 import Data.Biapplicative ((<<*>>))
 import Data.Char (toUpper)

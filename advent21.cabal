@@ -24,8 +24,8 @@ source-repository head
 
 library
   exposed-modules:
-      Day1.Solution
-      Day2.Solution
+      Day01.Solution
+      Day02.Solution
       Lib.Utils
   other-modules:
       Paths_advent21

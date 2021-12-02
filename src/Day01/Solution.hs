@@ -1,4 +1,4 @@
-module Day1.Solution (parse, solveA, solveB) where
+module Day01.Solution (parse, solveA, solveB) where
 
 import Data.List (tails)
 import Data.List.Extra (dropEnd)

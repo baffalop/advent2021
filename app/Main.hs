@@ -9,11 +9,12 @@ import Data.Tuple.Extra (both)
 import Options.Applicative (help, long, metavar, short)
 import System.Directory.Extra (doesFileExist)
 import Text.Read (readMaybe)
+import Text.Printf (printf)
 import qualified Options.Applicative as Opt
 
 import Lib.Utils (maybeIf)
-import qualified Day1.Solution as Day1
-import qualified Day2.Solution as Day2
+import qualified Day01.Solution as Day01
+import qualified Day02.Solution as Day02
 
 data Options = Options
   { day :: Day
@@ -48,8 +49,8 @@ main = do
 
 solutionFor :: Day -> Solution
 solutionFor day = case day of
-  1 -> solutions Day1.parse Day1.solveA Day1.solveB
-  2 -> solutions Day2.parse Day2.solveA Day2.solveB
+  1 -> solutions Day01.parse Day01.solveA Day01.solveB
+  2 -> solutions Day02.parse Day02.solveA Day02.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
 solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> Solution
@@ -74,7 +75,7 @@ opts =
 
 fetchInput :: Options -> IO String
 fetchInput Options{ day, key } = do
-  let inputFilePath = inputPathFor day
+  let inputFilePath = "inputs/Day" <> printf "%02d" day <> ".txt"
   inputFileExists <- doesFileExist inputFilePath
   if inputFileExists
     then do
@@ -86,9 +87,6 @@ fetchInput Options{ day, key } = do
       case key of
         Just k -> fetchInputFromApi day k
         Nothing -> fail "Please provide a session key to fetch data"
-
-inputPathFor :: Day -> FilePath
-inputPathFor day = "inputs/Day" <> show day <> ".txt"
 
 fetchInputFromApi :: Day -> SessionKey -> IO String
 fetchInputFromApi day key = error "not implemented"
