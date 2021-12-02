@@ -10,10 +10,9 @@ import Data.Tuple.Extra (both)
 import Options.Applicative (help, long, metavar, short)
 import System.Directory.Extra (doesFileExist)
 import Text.Read (readMaybe)
-import Data.Biapplicative ((<<*>>))
 import qualified Options.Applicative as Opt
 
-import Lib.Utils (maybeIf, dup)
+import Lib.Utils (maybeIf)
 import qualified Day1.Solution as Day1
 import qualified Day2.Solution as Day2
 
@@ -52,7 +51,7 @@ main = do
 
 solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> (String -> (String, String))
 solutions parse solveA solveB input =
-  show `both` ((solveA, solveB) <<*>> dup (parse input))
+  (show . ($ parse input)) `both` (solveA, solveB)
 
 -- solutionForDay :: Show a => Int -> Solution r a
 -- solutionForDay n = case n of

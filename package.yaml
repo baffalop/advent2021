@@ -23,7 +23,6 @@ dependencies:
 - extra
 - optparse-applicative
 - advent-of-code-api
-- bifunctors
   
 library:
   source-dirs: src
