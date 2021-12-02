@@ -24,6 +24,7 @@ dependencies:
 - optparse-applicative
 - advent-of-code-api
 - bifunctors
+- transformers
   
 library:
   source-dirs: src
