@@ -18,7 +18,7 @@ import qualified Day2.Solution as Day2
 data Options = Options
   { day :: Day
   , parts :: [DayPart]
-  , key :: SessionKey
+  , key :: Maybe SessionKey
   }
   deriving (Show)
 
@@ -75,7 +75,7 @@ opts =
     <*> (buildDayPart
       <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
-    <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
+    <*> (fmap Key <$> Opt.optional (Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key")))
 
 fetchInput :: Options -> IO String
 fetchInput Options{ day, key } = do
@@ -88,7 +88,9 @@ fetchInput Options{ day, key } = do
     else do
       putStrLn $ "File does not exist: " <> inputFilePath
       putStrLn "Fetching from API"
-      fetchInputFromApi day key
+      case key of
+        Just k -> fetchInputFromApi day k
+        Nothing -> fail "Please provide a session key to fetch data"
 
 inputPathFor :: Day -> FilePath
 inputPathFor day = "inputs/Day" <> show day <> ".txt"
