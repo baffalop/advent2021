@@ -2,13 +2,13 @@
 
 module Day2.Solution (parse, solveA, solveB) where
 
-import Text.Read (readMaybe)
-import Data.List.Extra (upper)
-import Data.Char (toUpper)
 import Data.Biapplicative ((<<*>>))
-import Data.Tuple.Extra (both)
-import Data.Maybe (fromMaybe)
+import Data.Char (toUpper)
 import Data.Foldable (foldl')
+import Data.List.Extra (upper)
+import Data.Maybe (fromMaybe)
+import Data.Tuple.Extra (both)
+import Text.Read (readMaybe)
 
 data Direction = Up | Down | Forward
   deriving (Eq, Show, Read)
