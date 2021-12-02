@@ -30,12 +30,12 @@ solveA = uncurry (*) . foldr ((<<*>>) . both (+) . move) (0, 0)
       Forward -> (n, 0)
 
 data Velocity = Velocity
-  { coords :: (Int, Int)
-  , aim :: Int
+  { aim :: Int
+  , coords :: (Int, Int)
   }
 
 solveB :: [(Direction, Int)] -> Int
-solveB = uncurry (*) . coords . foldl' move (Velocity (0, 0) 0)
+solveB = uncurry (*) . coords . foldl' move (Velocity 0 (0, 0))
   where
     move :: Velocity -> (Direction, Int) -> Velocity
     move v@Velocity{ aim, coords } (dir, n) = case dir of
