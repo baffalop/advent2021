@@ -5,7 +5,6 @@ module Day02.Solution (parse, solveA, solveB) where
 import Data.Biapplicative ((<<*>>))
 import Data.Char (toUpper)
 import Data.Foldable (foldl')
-import Data.List.Extra (upper)
 import Data.Maybe (fromMaybe)
 import Data.Tuple.Extra (both)
 import Text.Read (readMaybe)
