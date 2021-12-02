@@ -9,3 +9,6 @@ pairs = withConsecutive (,)
 
 withConsecutive :: (a -> a -> b) -> [a] -> [b]
 withConsecutive f xs = zipWith f xs (drop 1 xs)
+
+dup :: a -> (a, a)
+dup x = (x, x)

@@ -25,6 +25,7 @@ source-repository head
 library
   exposed-modules:
       Day1.Solution
+      Day2.Solution
       Lib.Utils
   other-modules:
       Paths_advent21
@@ -33,6 +34,7 @@ library
   build-depends:
       advent-of-code-api
     , base >=4.7 && <5
+    , bifunctors
     , extra
     , optparse-applicative
   default-language: Haskell2010
@@ -48,6 +50,7 @@ executable advent21-exe
       advent-of-code-api
     , advent21
     , base >=4.7 && <5
+    , bifunctors
     , extra
     , optparse-applicative
   default-language: Haskell2010
@@ -64,6 +67,7 @@ test-suite advent21-test
       advent-of-code-api
     , advent21
     , base >=4.7 && <5
+    , bifunctors
     , extra
     , optparse-applicative
   default-language: Haskell2010

@@ -2,16 +2,20 @@
 
 module Main where
     
+import Data.Function ((&))
 import Control.Monad (when)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
+import Data.Tuple.Extra (both)
 import Options.Applicative (help, long, metavar, short)
 import System.Directory.Extra (doesFileExist)
 import Text.Read (readMaybe)
+import Data.Biapplicative ((<<*>>))
 import qualified Options.Applicative as Opt
 
-import Lib.Utils (maybeIf)
+import Lib.Utils (maybeIf, dup)
 import qualified Day1.Solution as Day1
+import qualified Day2.Solution as Day2
 
 data Options = Options
   { day :: Day
@@ -30,12 +34,6 @@ newtype SessionKey = Key String
 instance Show SessionKey where
   show (Key k) = k
 
-data Solution r a = Solution
-  { parse :: String -> r
-  , solveA :: r -> a
-  , solveB :: r -> a
-  }
-
 main :: IO ()
 main = do
   options@Options{ day, parts } <- Opt.execParser cli
@@ -44,13 +42,17 @@ main = do
   when (length input < 20) $
     error "Input is suspiciously small. Are you sure you piped the right thing?"
 
-  let Solution{ parse, solveA, solveB } = case day of
-        1 -> Solution Day1.parse Day1.solveA Day1.solveB
+  let (solutionA, solutionB) = input & case day of
+        1 -> solutions Day1.parse Day1.solveA Day1.solveB
+        2 -> solutions Day2.parse Day2.solveA Day2.solveB
         _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
-  let parsed = parse input
-  when (PartA `elem` parts) $ putStrLn $ "Part A: " <> show (solveA parsed)
-  when (PartB `elem` parts) $ putStrLn $ "Part B: " <> show (solveB parsed)
+  when (PartA `elem` parts) $ putStrLn $ "Part A: " <> solutionA
+  when (PartB `elem` parts) $ putStrLn $ "Part B: " <> solutionB
+
+solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> (String -> (String, String))
+solutions parse solveA solveB input =
+  show `both` ((solveA, solveB) <<*>> dup (parse input))
 
 -- solutionForDay :: Show a => Int -> Solution r a
 -- solutionForDay n = case n of
