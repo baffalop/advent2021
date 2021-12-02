@@ -1,6 +1,5 @@
 module Day2.Solution (parse, solveA, solveB) where
 
-import Data.List (foldl')
 import Text.Read (readMaybe)
 import Data.List.Extra (upper)
 import Data.Char (toUpper)
