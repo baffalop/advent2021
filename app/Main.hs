@@ -56,11 +56,6 @@ solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> Solution
 solutions parse solveA solveB input =
   (show . ($ parse input)) `both` (solveA, solveB)
 
--- solutionForDay :: Show a => Int -> Solution r a
--- solutionForDay n = case n of
---   1 -> Solution Day1.parse Day1.solveA Day1.solveB
---   _ -> error $ "Have not solved for Day " <> show n <> " yet"
-
 cli :: Opt.ParserInfo Options
 cli =
   Opt.info (Opt.helper <*> opts) $
