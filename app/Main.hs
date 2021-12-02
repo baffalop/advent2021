@@ -43,12 +43,12 @@ main = do
   when (length input < 20) $
     error "Input is suspiciously small. Are you sure you piped the right thing?"
 
-  let (solutionA, solutionB) = solutionFor day input
+  let (solutionA, solutionB) = solutionsFor day input
   when (PartA `elem` parts) $ putStrLn $ "Part A: " <> solutionA
   when (PartB `elem` parts) $ putStrLn $ "Part B: " <> solutionB
 
-solutionFor :: Day -> Solution
-solutionFor day = case day of
+solutionsFor :: Day -> Solution
+solutionsFor day = case day of
   1 -> solutions Day01.parse Day01.solveA Day01.solveB
   2 -> solutions Day02.parse Day02.solveA Day02.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
