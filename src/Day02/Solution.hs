@@ -20,7 +20,7 @@ parseWords [dir, n] = (,) <$> readMaybe (titleCase dir) <*> readMaybe n
 parseWords _ = Nothing
 
 solveA :: [(Direction, Int)] -> Int
-solveA = uncurry (*) . foldr ((<<*>>) . both (+) . move) (0, 0)
+solveA = uncurry (*) . foldr (add . move) (0, 0)
   where
     move :: (Direction, Int) -> (Int, Int)
     move (dir, n) = case dir of
@@ -40,7 +40,10 @@ solveB = uncurry (*) . coords . foldl' move (Velocity 0 (0, 0))
     move v@Velocity{ aim, coords } (dir, n) = case dir of
       Up -> v{ aim = aim - n }
       Down -> v{ aim = aim + n }
-      Forward -> v{ coords = both (+) (n, n * aim) <<*>> coords }
+      Forward -> v{ coords = add (n, n * aim) coords }
+
+add :: Num n => (n, n) -> (n, n) -> (n, n)
+add x y = both (+) x <<*>> y
 
 titleCase :: String -> String
 titleCase "" = ""
