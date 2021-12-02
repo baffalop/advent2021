@@ -2,7 +2,6 @@
 
 module Main where
     
-import Data.Function ((&))
 import Control.Monad (when)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
@@ -33,6 +32,8 @@ newtype SessionKey = Key String
 instance Show SessionKey where
   show (Key k) = k
 
+type Solution = String -> (String, String)
+
 main :: IO ()
 main = do
   options@Options{ day, parts } <- Opt.execParser cli
@@ -41,15 +42,17 @@ main = do
   when (length input < 20) $
     error "Input is suspiciously small. Are you sure you piped the right thing?"
 
-  let (solutionA, solutionB) = input & case day of
-        1 -> solutions Day1.parse Day1.solveA Day1.solveB
-        2 -> solutions Day2.parse Day2.solveA Day2.solveB
-        _ -> error $ "Have not solved for Day " <> show day <> " yet"
-
+  let (solutionA, solutionB) = solutionFor day input
   when (PartA `elem` parts) $ putStrLn $ "Part A: " <> solutionA
   when (PartB `elem` parts) $ putStrLn $ "Part B: " <> solutionB
 
-solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> (String -> (String, String))
+solutionFor :: Day -> Solution
+solutionFor day = case day of
+  1 -> solutions Day1.parse Day1.solveA Day1.solveB
+  2 -> solutions Day2.parse Day2.solveA Day2.solveB
+  _ -> error $ "Have not solved for Day " <> show day <> " yet"
+
+solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> Solution
 solutions parse solveA solveB input =
   (show . ($ parse input)) `both` (solveA, solveB)
 
