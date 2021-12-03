@@ -103,5 +103,5 @@ buildDayPart a b = catMaybes [maybeIf a PartA, maybeIf b PartB]
 
 aocOpts :: SessionKey -> Advent.AoCOpts
 aocOpts (Key key) =
-  defaultOpts { Advent._aCache = Just "inputs" }
+  defaultOpts { Advent._aCache = Just "." }
   where defaultOpts = Advent.defaultAoCOpts 2021 key
