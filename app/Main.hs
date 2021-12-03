@@ -2,7 +2,7 @@
 
 module Main where
     
-import Control.Monad (when, guard)
+import Control.Monad (when)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
 import Data.Tuple.Extra (both)
@@ -10,7 +10,7 @@ import Options.Applicative (help, long, metavar, short)
 import Text.Read (readMaybe)
 import qualified Advent
 import qualified Options.Applicative as Opt
-import Data.Text (Text, unpack)
+import Data.Text (unpack)
 
 import Lib.Utils (maybeIf)
 import qualified Day01.Solution as Day01
