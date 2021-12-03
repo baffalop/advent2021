@@ -21,6 +21,7 @@ description:         Solutions to Advent of Code 2021 in Haskell
 dependencies:
 - base >= 4.7 && < 5
 - extra
+- text
 - optparse-applicative
 - advent-of-code-api
 - bifunctors

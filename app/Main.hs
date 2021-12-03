@@ -2,15 +2,15 @@
 
 module Main where
     
-import Control.Monad (when)
+import Control.Monad (when, guard)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
 import Data.Tuple.Extra (both)
 import Options.Applicative (help, long, metavar, short)
-import System.Directory.Extra (doesFileExist)
 import Text.Read (readMaybe)
-import Text.Printf (printf)
+import qualified Advent
 import qualified Options.Applicative as Opt
+import Data.Text (Text, unpack)
 
 import Lib.Utils (maybeIf)
 import qualified Day01.Solution as Day01
@@ -20,7 +20,7 @@ import qualified Day03.Solution as Day03
 data Options = Options
   { day :: Day
   , parts :: [DayPart]
-  , key :: Maybe SessionKey
+  , key :: SessionKey
   }
   deriving (Show)
 
@@ -42,6 +42,7 @@ main = do
   options@Options{ day, parts } <- Opt.execParser cli
 
   input <- fetchInput options
+
   when (length input < 20) $
     fail "Input is suspiciously small. Are you sure you piped the right thing?"
 
@@ -77,25 +78,14 @@ opts =
     <*> (buildDayPart
       <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
-    <*> (fmap Key <$> Opt.optional (Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key")))
+    <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
 
 fetchInput :: Options -> IO String
 fetchInput Options{ day, key } = do
-  let inputFilePath = "inputs/Day" <> printf "%02d" day <> ".txt"
-  inputFileExists <- doesFileExist inputFilePath
-  if inputFileExists
-    then do
-      putStrLn $ "Reading input from file: " <> inputFilePath
-      readFile inputFilePath
-    else do
-      putStrLn $ "File does not exist: " <> inputFilePath
-      putStrLn "Fetching from API"
-      case key of
-        Just k -> fetchInputFromApi day k
-        Nothing -> fail "Please provide a session key to fetch data"
-
-fetchInputFromApi :: Day -> SessionKey -> IO String
-fetchInputFromApi day key = error "not implemented"
+  response <- Advent.runAoC (aocOpts key) (Advent.AoCInput $ Advent.mkDay_ $ toInteger day)
+  case response of
+    Left err -> fail $ "Error response from API: " <> show err
+    Right input -> pure $ unpack input
 
 dayNumberOpt :: Int -> Opt.ReadM Day
 dayNumberOpt bound =
@@ -110,3 +100,8 @@ dayNumberOpt bound =
 buildDayPart :: Bool -> Bool -> [DayPart]
 buildDayPart False False = [PartA, PartB]
 buildDayPart a b = catMaybes [maybeIf a PartA, maybeIf b PartB]
+
+aocOpts :: SessionKey -> Advent.AoCOpts
+aocOpts (Key key) =
+  defaultOpts { Advent._aCache = Just "inputs" }
+  where defaultOpts = Advent.defaultAoCOpts 2021 key
