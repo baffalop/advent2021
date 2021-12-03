@@ -15,6 +15,7 @@ import qualified Options.Applicative as Opt
 import Lib.Utils (maybeIf)
 import qualified Day01.Solution as Day01
 import qualified Day02.Solution as Day02
+import qualified Day03.Solution as Day03
 
 data Options = Options
   { day :: Day
@@ -54,6 +55,7 @@ solutionsFor :: Day -> Solution
 solutionsFor day = case day of
   1 -> solutions Day01.parse Day01.solveA Day01.solveB
   2 -> solutions Day02.parse Day02.solveA Day02.solveB
+  3 -> solutions Day03.parse Day03.solveA Day03.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
 solutions :: Show a => (String -> Either ParseError r) -> (r -> a) -> (r -> a) -> Solution
