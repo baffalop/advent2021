@@ -6,23 +6,25 @@ import Data.Tuple.Extra (both)
 import Data.Maybe (mapMaybe)
 import Text.Read (readMaybe)
 
-parse :: String -> Either a [String]
+type Binary = String
+
+parse :: String -> Either Never [Binary]
 parse = Right . lines
 
-solveA :: [String] -> Int
+solveA :: [Binary] -> Int
 solveA = uncurry (*) . both toInt . (id &&& invert) . fmap mostCommonDigit . transpose
 
-solveB :: [String] -> Int
+solveB :: [Binary] -> Int
 solveB = undefined
 
-mostCommonDigit :: String -> Char
+mostCommonDigit :: Binary -> Char
 mostCommonDigit ds =
   if (length $ filter (== '0') ds) >= (length ds `div` 2)
     then '0' else '1'
 
-toInt :: String -> Int
+toInt :: Binary -> Int
 toInt =
   sum . zipWith (*) (fmap (2^) [0..]) . reverse . mapMaybe (readMaybe . (:[]))
 
-invert :: String -> String
+invert :: Binary -> Binary
 invert = fmap (\bit -> if bit == '0' then '1' else '0')
