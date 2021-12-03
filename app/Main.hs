@@ -22,7 +22,6 @@ data Options = Options
   , parts :: [DayPart]
   , key :: SessionKey
   }
-  deriving (Show)
 
 type Day = Int
 
@@ -30,9 +29,6 @@ data DayPart = PartA | PartB
   deriving (Eq, Show)
 
 newtype SessionKey = Key String
-
-instance Show SessionKey where
-  show (Key k) = k
 
 type Solution = String -> Either ParseError (String, String)
 type ParseError = String
