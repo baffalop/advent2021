@@ -1,4 +1,4 @@
-module Day03.Solution (parse, solveA, solveB) where
+module Day03.Solution where
 
 import Data.Function (on)
 import Data.List (transpose, partition, maximumBy)
@@ -14,11 +14,11 @@ parse :: String -> Either a [Binary]
 parse = Right . lines
 
 solveA :: [Binary] -> Int
-solveA = uncurry multiply . (id &&& fmap bitFlip) . fmap mostCommonBit . transpose
+solveA = uncurry multDecimal . (id &&& fmap bitFlip) . fmap mostCommonBit . transpose
 
 solveB :: [Binary] -> Int
 solveB input =
-  uncurry multiply $ both (\f -> matchByBitCriteria (f . mostCommonBit) input) (id, bitFlip)
+  uncurry multDecimal $ both (\f -> matchByBitCriteria (f . mostCommonBit) input) (id, bitFlip)
 
 matchByBitCriteria :: (Binary -> Bit) -> [Binary] -> Binary
 matchByBitCriteria criteria input =
@@ -30,16 +30,22 @@ prefixMatch _ _ = 0
 
 mostCommonBit :: Binary -> Bit
 mostCommonBit ds =
-  if (length $ filter (== '0') ds) >= (length ds `div` 2)
+  if (frequency '0' ds) >= (length ds `div` 2)
     then '0' else '1'
 
-multiply :: Binary -> Binary -> Int
-multiply = (*) `on` toInt
+multDecimal :: Binary -> Binary -> Int
+multDecimal = (*) `on` decimal
 
-toInt :: Binary -> Int
-toInt =
-  sum . zipWith (*) (fmap (2^) [0..]) . reverse . mapMaybe (readMaybe . (:[]))
+decimal :: Binary -> Int
+decimal =
+  sum . zipWith (*) (powersOf 2) . reverse . mapMaybe (readMaybe . (:[]))
 
 bitFlip :: Bit -> Bit
 bitFlip '0' = '1'
 bitFlip _ = '0'
+
+powersOf :: Int -> [Int]
+powersOf x = fmap (x^) [0..]
+
+frequency :: Eq a => a -> [a] -> Int
+frequency x = length . filter (== x)
