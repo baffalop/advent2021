@@ -1,10 +1,10 @@
 module Day03.Solution where
 
 import Data.Function (on)
-import Data.List (transpose, maximumBy)
+import Data.List (transpose, uncons)
 import Control.Arrow ((&&&))
 import Data.Tuple.Extra (both)
-import Data.Maybe (mapMaybe)
+import Data.Maybe (mapMaybe, fromMaybe)
 import Text.Read (readMaybe)
 
 type Binary = String
@@ -18,20 +18,22 @@ solveA = uncurry multDecimal . (id &&& fmap bitFlip) . fmap mostCommonBit . tran
 
 solveB :: [Binary] -> Int
 solveB input =
-  uncurry multDecimal $ both (\f -> matchByBitCriteria (f . mostCommonBit) input) (id, bitFlip)
-
-matchByBitCriteria :: (Binary -> Bit) -> [Binary] -> Binary
-matchByBitCriteria criteria input =
-  maximumBy (compare `on` (prefixMatch $ fmap criteria $ transpose input)) input
-
-prefixMatch :: Eq a => [a] -> [a] -> Int
-prefixMatch (x:xs) (y:ys) | x == y = 1 + prefixMatch xs ys
-prefixMatch _ _ = 0
+  uncurry multDecimal $ both (\f -> sieveByBitCriteria (f . mostCommonBit) input) (id, bitFlip)
 
 mostCommonBit :: Binary -> Bit
 mostCommonBit ds =
-  if (frequency '0' ds) >= (length ds `div` 2)
-    then '0' else '1'
+  if (frequency '0' ds) > (length ds `div` 2) then '0' else '1'
+
+sieveByBitCriteria :: (Binary -> Bit) -> [Binary] -> Binary
+sieveByBitCriteria criteria = sieve
+  where
+    sieve input = fromMaybe [] $ do
+      unconsed <- traverse uncons input
+      let matchingBit = criteria $ fmap fst unconsed
+      case filter ((== matchingBit) . fst) unconsed of
+        [] -> Nothing
+        [(head, tail)] -> Just $ head : tail
+        candidates -> Just $ matchingBit : sieve (fmap snd candidates)
 
 multDecimal :: Binary -> Binary -> Int
 multDecimal = (*) `on` decimal
