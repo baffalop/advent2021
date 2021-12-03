@@ -14,15 +14,16 @@ parse :: String -> Either a [Binary]
 parse = Right . lines
 
 solveA :: [Binary] -> Int
-solveA = uncurry multDecimal . (id &&& fmap bitFlip) . fmap mostCommonBit . transpose
+solveA =
+  multiply . (id &&& fmap bitFlip) . fmap mostCommonBit . transpose
 
 solveB :: [Binary] -> Int
 solveB input =
-  uncurry multDecimal $ both (\f -> sieveByBitCriteria (f . mostCommonBit) input) (id, bitFlip)
+  multiply $ both (\f -> sieveByBitCriteria (f . mostCommonBit) input) (id, bitFlip)
 
 mostCommonBit :: Binary -> Bit
-mostCommonBit ds =
-  if (frequency '0' ds) > (length ds `div` 2) then '0' else '1'
+mostCommonBit bits =
+  if (frequency '0' bits) > (length bits `div` 2) then '0' else '1'
 
 sieveByBitCriteria :: (Binary -> Bit) -> [Binary] -> Binary
 sieveByBitCriteria criteria = sieve
@@ -35,8 +36,8 @@ sieveByBitCriteria criteria = sieve
         [(head, tail)] -> Just $ head : tail
         candidates -> Just $ matchingBit : sieve (fmap snd candidates)
 
-multDecimal :: Binary -> Binary -> Int
-multDecimal = (*) `on` decimal
+multiply :: (Binary, Binary) -> Int
+multiply = uncurry ((*) `on` decimal)
 
 decimal :: Binary -> Int
 decimal =
