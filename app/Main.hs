@@ -40,12 +40,7 @@ type ParseError = String
 main :: IO ()
 main = do
   options@Options{ day, parts } <- Opt.execParser cli
-
   input <- fetchInput options
-
-  when (length input < 20) $
-    fail "Input is suspiciously small. Are you sure you piped the right thing?"
-
   case solutionsFor day input of
     Left e -> fail e
     Right (solutionA, solutionB) -> do
