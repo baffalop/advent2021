@@ -1,7 +1,7 @@
 module Day03.Solution where
 
 import Data.Function (on)
-import Data.List (transpose, partition, maximumBy)
+import Data.List (transpose, maximumBy)
 import Control.Arrow ((&&&))
 import Data.Tuple.Extra (both)
 import Data.Maybe (mapMaybe)
