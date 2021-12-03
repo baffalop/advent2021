@@ -4,6 +4,7 @@ module Day02.Solution (parse, solveA, solveB) where
 
 import Data.Biapplicative ((<<*>>))
 import Data.Char (toUpper)
+import Data.Either.Extra (maybeToEither)
 import Data.Foldable (foldl')
 import Data.Maybe (fromMaybe)
 import Data.Tuple.Extra (both)
@@ -12,8 +13,8 @@ import Text.Read (readMaybe)
 data Direction = Up | Down | Forward
   deriving (Eq, Show, Read)
 
-parse :: String -> [(Direction, Int)]
-parse = fromMaybe (error "Parse failed") . traverse (parseWords . words) . lines
+parse :: String -> Either String [(Direction, Int)]
+parse = maybeToEither "Parse failed" . traverse (parseWords . words) . lines
 
 parseWords :: [String] -> Maybe (Direction, Int)
 parseWords [dir, n] = (,) <$> readMaybe (titleCase dir) <*> readMaybe n

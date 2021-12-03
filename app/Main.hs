@@ -33,7 +33,8 @@ newtype SessionKey = Key String
 instance Show SessionKey where
   show (Key k) = k
 
-type Solution = String -> (String, String)
+type Solution = String -> Either ParseError (String, String)
+type ParseError = String
 
 main :: IO ()
 main = do
@@ -41,11 +42,13 @@ main = do
 
   input <- fetchInput options
   when (length input < 20) $
-    error "Input is suspiciously small. Are you sure you piped the right thing?"
+    fail "Input is suspiciously small. Are you sure you piped the right thing?"
 
-  let (solutionA, solutionB) = solutionsFor day input
-  when (PartA `elem` parts) $ putStrLn $ "Part A: " <> solutionA
-  when (PartB `elem` parts) $ putStrLn $ "Part B: " <> solutionB
+  case solutionsFor day input of
+    Left e -> fail e
+    Right (solutionA, solutionB) -> do
+      when (PartA `elem` parts) $ putStrLn $ "Part A: " <> solutionA
+      when (PartB `elem` parts) $ putStrLn $ "Part B: " <> solutionB
 
 solutionsFor :: Day -> Solution
 solutionsFor day = case day of
@@ -53,9 +56,10 @@ solutionsFor day = case day of
   2 -> solutions Day02.parse Day02.solveA Day02.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
-solutions :: Show a => (String -> r) -> (r -> a) -> (r -> a) -> Solution
-solutions parse solveA solveB input =
-  (show . ($ parse input)) `both` (solveA, solveB)
+solutions :: Show a => (String -> Either ParseError r) -> (r -> a) -> (r -> a) -> Solution
+solutions parse solveA solveB input = do
+  parsed <- parse input
+  pure $ (show . ($ parsed)) `both` (solveA, solveB)
 
 cli :: Opt.ParserInfo Options
 cli =
