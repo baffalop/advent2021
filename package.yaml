@@ -26,6 +26,7 @@ dependencies:
 - advent-of-code-api
 - bifunctors
 - transformers
+- attoparsec
   
 library:
   source-dirs: src

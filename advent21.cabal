@@ -27,6 +27,7 @@ library
       Day01.Solution
       Day02.Solution
       Day03.Solution
+      Day04.Solution
       Lib.Utils
   other-modules:
       Paths_advent21
@@ -34,6 +35,7 @@ library
       src
   build-depends:
       advent-of-code-api
+    , attoparsec
     , base >=4.7 && <5
     , bifunctors
     , extra
@@ -52,6 +54,7 @@ executable advent21-exe
   build-depends:
       advent-of-code-api
     , advent21
+    , attoparsec
     , base >=4.7 && <5
     , bifunctors
     , extra
@@ -71,6 +74,7 @@ test-suite advent21-test
   build-depends:
       advent-of-code-api
     , advent21
+    , attoparsec
     , base >=4.7 && <5
     , bifunctors
     , extra
