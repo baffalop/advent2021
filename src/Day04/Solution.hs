@@ -26,16 +26,16 @@ type BoardSet = [Set Int]
 
 parse :: Text -> Either String Bingo
 parse = P.parseOnly $ Bingo
-  <$> P.sepBy1 P.decimal (P.char ',')
+  <$> P.decimal `P.sepBy1'` P.char ','
   <*  P.skipSpace
-  <*> P.sepBy1' board P.skipSpace
+  <*> board `P.sepBy1'` P.skipSpace
   where
     board :: Parser Board
     board =
       flip P.sepBy1' P.endOfLine $
         -- a board row might start with a padding space
         P.option () hSpace *>
-        P.sepBy1' P.decimal (P.many1' hSpace)
+        P.decimal `P.sepBy1'` P.many1' hSpace
 
     hSpace :: Parser ()
     hSpace = P.skip P.isHorizontalSpace
