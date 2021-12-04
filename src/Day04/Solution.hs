@@ -3,7 +3,7 @@
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE RankNTypes #-}
 
-module Day04.Solution where
+module Day04.Solution (parse, solveA, solveB) where
 
 import Data.List (transpose, partition)
 import Data.Text (Text)

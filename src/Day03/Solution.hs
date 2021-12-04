@@ -1,4 +1,4 @@
-module Day03.Solution where
+module Day03.Solution (parse, solveA, solveB) where
 
 import Data.Function (on)
 import Data.List (transpose, uncons)
