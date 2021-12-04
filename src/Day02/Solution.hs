@@ -9,12 +9,13 @@ import Data.Foldable (foldl')
 import Data.Maybe (fromMaybe)
 import Data.Tuple.Extra (both)
 import Text.Read (readMaybe)
+import Data.Text (Text, unpack)
 
 data Direction = Up | Down | Forward
   deriving (Eq, Show, Read)
 
-parse :: String -> Either String [(Direction, Int)]
-parse = maybeToEither "Parse failed" . traverse (parseWords . words) . lines
+parse :: Text -> Either String [(Direction, Int)]
+parse = maybeToEither "Parse failed" . traverse (parseWords . words) . lines . unpack
 
 parseWords :: [String] -> Maybe (Direction, Int)
 parseWords [dir, n] = (,) <$> readMaybe (titleCase dir) <*> readMaybe n

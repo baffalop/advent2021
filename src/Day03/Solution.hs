@@ -6,12 +6,13 @@ import Control.Arrow ((&&&))
 import Data.Tuple.Extra (both)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Text.Read (readMaybe)
+import Data.Text (Text, unpack)
 
 type Binary = String
 type Bit = Char
 
-parse :: String -> Either a [Binary]
-parse = Right . lines
+parse :: Text -> Either a [Binary]
+parse = Right . lines . unpack
 
 solveA :: [Binary] -> Int
 solveA =

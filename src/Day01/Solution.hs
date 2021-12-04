@@ -5,9 +5,10 @@ import Data.List (tails)
 import Data.List.Extra (dropEnd)
 import Lib.Utils (withConsecutive)
 import Text.Read (readMaybe)
+import Data.Text (Text, unpack)
     
-parse :: String -> Either String [Int]
-parse = maybeToEither "Non-integer in input" . traverse readMaybe . lines
+parse :: Text -> Either String [Int]
+parse = maybeToEither "Non-integer in input" . traverse readMaybe . lines . unpack
 
 solveA :: [Int] -> Int
 solveA = length . filter (< 0) . withConsecutive (-)

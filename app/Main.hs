@@ -10,7 +10,7 @@ import Options.Applicative (help, long, metavar, short)
 import Text.Read (readMaybe)
 import qualified Advent
 import qualified Options.Applicative as Opt
-import Data.Text (unpack)
+import Data.Text (Text)
 
 import Lib.Utils (maybeIf)
 import qualified Day01.Solution as Day01
@@ -30,7 +30,7 @@ data DayPart = PartA | PartB
 
 newtype SessionKey = Key String
 
-type Solution = String -> Either ParseError (String, String)
+type Solution = Text -> Either ParseError (String, String)
 type ParseError = String
 
 main :: IO ()
@@ -50,7 +50,7 @@ solutionsFor day = case day of
   3 -> solutions Day03.parse Day03.solveA Day03.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
-solutions :: Show a => (String -> Either ParseError r) -> (r -> a) -> (r -> a) -> Solution
+solutions :: Show a => (Text -> Either ParseError r) -> (r -> a) -> (r -> a) -> Solution
 solutions parse solveA solveB input = do
   parsed <- parse input
   pure $ (show . ($ parsed)) `both` (solveA, solveB)
@@ -71,12 +71,12 @@ opts =
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
     <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
 
-fetchInput :: Options -> IO String
+fetchInput :: Options -> IO Text
 fetchInput Options{ day, key } = do
   response <- Advent.runAoC (aocOpts key) (Advent.AoCInput $ Advent.mkDay_ $ toInteger day)
   case response of
     Left err -> fail $ "Error response from API: " <> show err
-    Right input -> pure $ unpack input
+    Right input -> pure input
 
 dayNumberOpt :: Int -> Opt.ReadM Day
 dayNumberOpt bound =
