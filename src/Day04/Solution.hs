@@ -60,10 +60,9 @@ play (called:next) boards =
 
 score :: (Int, BoardSet) -> Int
 score (winningNumber, unmarked) =
-  -- the sets in unmarked include both rows and columns so will have duplicate numbers
-  -- take the first half for only rows
-  let unmarkedRows = take (length unmarked `div` 2) unmarked
-  in winningNumber * sum (fmap sum unmarkedRows)
+  winningNumber * sum (fmap sum unmarked)
+  -- the sets in unmarked include both rows and columns so each number will be duplicated
+    `div` 2
 
 {-| The sets of rows *and* columns in the board -}
 toSets :: Board -> BoardSet
