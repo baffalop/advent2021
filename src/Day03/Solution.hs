@@ -7,12 +7,14 @@ import Data.Tuple.Extra (both)
 import Data.Maybe (mapMaybe, fromMaybe)
 import Text.Read (readMaybe)
 import Data.Text (Text, unpack)
+import Data.Either.Extra (maybeToEither)
 
-type Binary = String
-type Bit = Char
+type Binary = [Int]
+type Bit = Int
 
-parse :: Text -> Either a [Binary]
-parse = Right . lines . unpack
+parse :: Text -> Either String [Binary]
+parse = maybeToEither "Non-integer in input" .
+  traverse (traverse (readMaybe . (:[]))) . lines . unpack
 
 solveA :: [Binary] -> Int
 solveA =
@@ -24,7 +26,7 @@ solveB input =
 
 mostCommonBit :: Binary -> Bit
 mostCommonBit bits =
-  if (frequency '0' bits) > (length bits `div` 2) then '0' else '1'
+  if frequency 0 bits > (length bits `div` 2) then 0 else 1
 
 sieveByBitCriteria :: (Binary -> Bit) -> [Binary] -> Binary
 sieveByBitCriteria criteria = sieve
@@ -41,12 +43,10 @@ multiply :: (Binary, Binary) -> Int
 multiply = uncurry ((*) `on` decimal)
 
 decimal :: Binary -> Int
-decimal =
-  sum . zipWith (*) (powersOf 2) . reverse . mapMaybe (readMaybe . (:[]))
+decimal = sum . zipWith (*) (powersOf 2) . reverse
 
 bitFlip :: Bit -> Bit
-bitFlip '0' = '1'
-bitFlip _ = '0'
+bitFlip = (1 -)
 
 powersOf :: Int -> [Int]
 powersOf x = fmap (x^) [0..]
