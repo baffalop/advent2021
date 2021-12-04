@@ -38,6 +38,7 @@ library
     , attoparsec
     , base >=4.7 && <5
     , bifunctors
+    , containers
     , extra
     , optparse-applicative
     , text
@@ -57,6 +58,7 @@ executable advent21-exe
     , attoparsec
     , base >=4.7 && <5
     , bifunctors
+    , containers
     , extra
     , optparse-applicative
     , text
@@ -77,6 +79,7 @@ test-suite advent21-test
     , attoparsec
     , base >=4.7 && <5
     , bifunctors
+    , containers
     , extra
     , optparse-applicative
     , text
