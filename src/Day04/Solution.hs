@@ -14,13 +14,10 @@ type Board = [[Int]]
 
 parse :: Text -> Either String Bingo
 parse = P.parseOnly $ Bingo
-  <$> intList
+  <$> P.sepBy1 P.decimal (P.char ',')
   <*  P.skipSpace
   <*> P.sepBy1' board P.skipSpace
   where
-    intList :: Parser [Int]
-    intList = P.sepBy1 P.decimal (P.char ',')
-
     board :: Parser Board
     board =
       flip P.sepBy1' P.endOfLine $
