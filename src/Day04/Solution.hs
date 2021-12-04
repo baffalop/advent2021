@@ -1,9 +1,11 @@
 {-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE RankNTypes #-}
 
 module Day04.Solution where
 
-import Data.List (transpose, foldl', find)
+import Data.List (transpose, partition)
 import Data.Text (Text)
 import Data.Attoparsec.Text (Parser)
 import qualified Data.Attoparsec.Text as P
@@ -11,6 +13,7 @@ import qualified Data.Set as Set
 import Data.Set (Set)
 import Control.Monad (liftM2)
 import Data.Function (on)
+import Lib.Utils (safeHead, safeLast)
 
 data Bingo = Bingo
   { called :: [Int]
@@ -38,24 +41,30 @@ parse = P.parseOnly $ Bingo
     hSpace = P.skip P.isHorizontalSpace
 
 solveA :: Bingo -> Maybe Int
-solveA Bingo{ called, boards } = do
-  (winningNumber, unmarked) <- play called $ fmap toSets boards
+solveA = playAndScore safeHead
+
+solveB :: Bingo -> Maybe Int
+solveB = playAndScore safeLast
+
+playAndScore :: (forall a . [a] -> Maybe a) -> Bingo -> Maybe Int
+playAndScore pick Bingo{ called, boards } =
+  fmap score $ pick $ play called $ fmap toSets boards
+
+play :: [Int] -> [BoardSet] -> [(Int, BoardSet)]
+play [] _ = []
+play (called:next) boards =
+  let
+    marked = fmap (Set.delete called) <$> boards
+    (winners, remaining) = partition (any Set.null) marked
+  in fmap (called,) winners ++ play next remaining
+
+score :: (Int, BoardSet) -> Int
+score (winningNumber, unmarked) =
   -- the sets in unmarked include both rows and columns so will have duplicate numbers
   -- take the first half for only rows
   let unmarkedRows = take (length unmarked `div` 2) unmarked
-  pure $ winningNumber * sum (fmap sum unmarkedRows)
-
-play :: [Int] -> [BoardSet] -> Maybe (Int, BoardSet)
-play [] _ = Nothing
-play (called:next) boards =
-  let marked = fmap (Set.delete called) <$> boards
-  in case find (any Set.null) marked of
-       Nothing -> play next marked
-       Just winner -> Just (called, winner)
+  in winningNumber * sum (fmap sum unmarkedRows)
 
 {-| The sets of rows *and* columns in the board -}
 toSets :: Board -> BoardSet
 toSets = liftM2 ((++) `on` fmap Set.fromList) id transpose
-
--- solveB :: Bingo -> Maybe Int
-solveB = undefined

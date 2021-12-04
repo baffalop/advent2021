@@ -12,3 +12,12 @@ withConsecutive f xs = zipWith f xs (drop 1 xs)
 
 dup :: a -> (a, a)
 dup x = (x, x)
+
+safeHead :: [a] -> Maybe a
+safeHead [] = Nothing
+safeHead (x:_) = Just x
+
+safeLast :: [a] -> Maybe a
+safeLast [] = Nothing
+safeLast [x] = Just x
+safeLast (_:xs) = safeLast xs
