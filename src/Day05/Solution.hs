@@ -22,10 +22,10 @@ parse = P.parseOnly $ line `P.sepBy1'` P.endOfLine
     point = (,) <$> P.decimal <* P.char ',' <*> P.decimal
 
 solveA :: [Line] -> Int
-solveA = countOverlapping . foldMap enumerate . filter isPerpendicular
+solveA = countOverlapping . foldMap points . filter isPerpendicular
 
 solveB :: [Line] -> Int
-solveB = countOverlapping . foldMap enumerate
+solveB = countOverlapping . foldMap points
 
 countOverlapping :: [Point] -> Int
 countOverlapping = Map.size . Map.filter (> 1) . counts
@@ -33,16 +33,12 @@ countOverlapping = Map.size . Map.filter (> 1) . counts
 counts :: Ord a => [a] -> Map.Map a Int
 counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
 
-enumerate :: Line -> [Point]
-enumerate ((x1, y1), (x2, y2)) =
-  zipWithLongest
-    (\xm ym -> (fromMaybe x1 xm, fromMaybe y1 ym))
-    (range x1 x2)
-    (range y1 y2)
+points :: Line -> [Point]
+points ((x1, y1), (x2, y2)) = zip (range x1 x2) (range y1 y2)
 
 isPerpendicular :: Line -> Bool
 isPerpendicular ((x1, y1), (x2, y2)) = x1 == x2 || y1 == y2
 
+{-| Range that can be descending. If from == to then it's infinite. -}
 range :: Int -> Int -> [Int]
-range from to | from > to = [from, (from - 1)..to]
-              | otherwise = [from..to]
+range from to = [from, from + signum (to - from)..to]
