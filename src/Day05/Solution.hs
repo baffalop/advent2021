@@ -3,7 +3,6 @@
 module Day05.Solution (parse, solveA, solveB) where
 
 import Data.Attoparsec.Text (Parser)
-import Data.Map.Strict (Map)
 import Data.Text (Text)
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
@@ -33,7 +32,8 @@ counts :: Ord a => [a] -> Map.Map a Int
 counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
 
 enumerate :: Line -> [Point]
-enumerate ((x1, y1), (x2, y2)) = [(x, y) | x <- [x1..x2], y <- [y1..y2]]
+enumerate ((x1, y1), (x2, y2)) =
+  [(x, y) | x <- [min x1 x2..max x1 x2], y <- [min y1 y2..max y1 y2]]
 
 isPerpendicular :: Line -> Bool
 isPerpendicular ((x1, y1), (x2, y2)) = x1 == x2 || y1 == y2
