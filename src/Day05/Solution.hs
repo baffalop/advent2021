@@ -35,7 +35,10 @@ counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
 
 enumerate :: Line -> [Point]
 enumerate ((x1, y1), (x2, y2)) =
-  zipWithLongest (\xm ym -> (fromMaybe x1 xm, fromMaybe y1 ym)) (range x1 x2) (range y1 y2)
+  zipWithLongest
+    (\xm ym -> (fromMaybe x1 xm, fromMaybe y1 ym))
+    (range x1 x2)
+    (range y1 y2)
 
 isPerpendicular :: Line -> Bool
 isPerpendicular ((x1, y1), (x2, y2)) = x1 == x2 || y1 == y2
