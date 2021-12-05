@@ -12,10 +12,11 @@ type Point = (Int, Int)
 type Line = (Point, Point)
 
 parse :: Text -> Either String [Line]
-parse = P.parseOnly $
-  flip P.sepBy1' P.endOfLine $
-  (,) <$> point <* P.string " -> " <*> point
+parse = P.parseOnly $ line `P.sepBy1'` P.endOfLine
   where
+    line :: Parser Line
+    line = (,) <$> point <* P.string " -> " <*> point
+
     point :: Parser Point
     point = (,) <$> P.decimal <* P.char ',' <*> P.decimal
 
