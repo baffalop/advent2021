@@ -3,11 +3,11 @@
 module Day05.Solution where
 
 import Data.Attoparsec.Text (Parser)
-import Data.Text (Text)
 import qualified Data.Attoparsec.Text as P
-import qualified Data.Map.Strict as Map
-import Data.List.Extra (zipWithLongest)
 import Data.Maybe (fromMaybe)
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
+import Data.Text (Text)
 
 type Point = (Int, Int)
 type Line = (Point, Point)
@@ -30,7 +30,7 @@ solveB = countOverlapping . foldMap points
 countOverlapping :: [Point] -> Int
 countOverlapping = Map.size . Map.filter (> 1) . counts
 
-counts :: Ord a => [a] -> Map.Map a Int
+counts :: Ord a => [a] -> Map a Int
 counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
 
 points :: Line -> [Point]
