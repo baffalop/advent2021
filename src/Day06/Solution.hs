@@ -27,10 +27,10 @@ solveB :: Generation -> Integer
 solveB = populationAfter 256
 
 populationAfter :: Int -> Generation -> Integer
-populationAfter n = sum . (!! n) . iterate simulate
+populationAfter n = sum . (!! n) . iterate generation
 
-simulate :: Generation -> Generation
-simulate gen =
+generation :: Generation -> Generation
+generation gen =
   let
     nextGen = Map.mapKeys (subtract 1) gen
   in fromMaybe nextGen $ do
