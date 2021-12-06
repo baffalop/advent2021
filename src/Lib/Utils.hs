@@ -24,5 +24,5 @@ safeLast [] = Nothing
 safeLast [x] = Just x
 safeLast (_:xs) = safeLast xs
 
-counts :: Ord a => [a] -> Map a Int
+counts :: (Ord a, Integral n) => [a] -> Map a n
 counts = foldr (flip (Map.insertWith (+)) 1) Map.empty

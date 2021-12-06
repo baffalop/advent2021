@@ -1,21 +1,42 @@
 module Day06.Solution (parse, solveA, solveB) where
   
-import Data.List.Extra (splitOn)
-import Data.List (partition)
-import Data.Text (Text, unpack)
-import Data.Either.Extra (maybeToEither)
-import Text.Read (readMaybe)
-import Data.Maybe (fromMaybe)
 import Data.Biapplicative (first)
+import Data.Either.Extra (maybeToEither)
+import Data.List (partition)
+import Data.List.Extra (splitOn)
+import Data.Map.Strict (Map)
+import Data.Maybe (fromMaybe)
+import Data.Text (Text, unpack)
+import Text.Read (readMaybe)
+import qualified Data.Map.Strict as Map
 
-parse :: Text -> Either String [Int]
-parse = maybeToEither "Parse fail" . traverse readMaybe . splitOn "," . unpack
+import Lib.Utils (counts)
 
-solveA :: [Int] -> Int
-solveA = length . (!! 80) . iterate simulate
+type Generation = Map Phase Count
+type Phase = Int
+type Count = Integer
 
-simulate :: [Int] -> [Int]
-simulate = uncurry (<>) . first (foldMap $ const [6, 8]) . partition (== -1) . fmap (subtract 1)
+parse :: Text -> Either String Generation
+parse = maybeToEither "Parse fail" .
+  fmap counts . traverse readMaybe . splitOn "," . unpack
 
-solveB :: [Int] -> Int
-solveB = length . (!! 256) . iterate simulate
+solveA :: Generation -> Integer
+solveA = populationAfter 80
+
+solveB :: Generation -> Integer
+solveB = populationAfter 256
+
+populationAfter :: Int -> Generation -> Integer
+populationAfter n = sum . (!! n) . iterate simulate
+
+simulate :: Generation -> Generation
+simulate gen =
+  let
+    nextGen = Map.mapKeys (subtract 1) gen
+  in fromMaybe nextGen $ do
+    births <- Map.lookup (-1) nextGen
+    pure
+      $ Map.delete (-1)
+      $ Map.insertWith (+) 6 births
+      $ Map.insertWith (+) 8 births
+      $ nextGen
