@@ -1,8 +1,6 @@
 module Day06.Solution (parse, solveA, solveB) where
   
-import Data.Biapplicative (first)
 import Data.Either.Extra (maybeToEither)
-import Data.List (partition)
 import Data.List.Extra (splitOn)
 import Data.Map.Strict (Map)
 import Data.Maybe (fromMaybe)
