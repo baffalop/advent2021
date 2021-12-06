@@ -1,4 +1,6 @@
 module Lib.Utils where
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 
 maybeIf :: Bool -> a -> Maybe a
 maybeIf True x = Just x
@@ -21,3 +23,6 @@ safeLast :: [a] -> Maybe a
 safeLast [] = Nothing
 safeLast [x] = Just x
 safeLast (_:xs) = safeLast xs
+
+counts :: Ord a => [a] -> Map a Int
+counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
