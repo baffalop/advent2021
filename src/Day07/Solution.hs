@@ -1,13 +1,11 @@
 module Day07.Solution (parse, solveA, solveB) where
 
-import Text.Read (readMaybe)
-import Data.List.Extra (splitOn)
-import Data.Text (Text, unpack)
-import Data.Either.Extra (maybeToEither)
 import Data.List (sort)
+import Data.Text (Text)
+import qualified Data.Attoparsec.Text as P
 
 parse :: Text -> Either String [Int]
-parse = maybeToEither "Parse fail" .  traverse readMaybe . splitOn "," . unpack
+parse = P.parseOnly $ P.decimal `P.sepBy1'` P.char ','
 
 solveA :: [Int] -> Int
 solveA positions = sum $ fmap (abs . (median positions -)) positions

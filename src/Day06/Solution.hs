@@ -1,11 +1,9 @@
 module Day06.Solution (parse, solveA, solveB) where
   
-import Data.Either.Extra (maybeToEither)
-import Data.List.Extra (splitOn)
 import Data.Map.Strict (Map)
 import Data.Maybe (fromMaybe)
-import Data.Text (Text, unpack)
-import Text.Read (readMaybe)
+import Data.Text (Text)
+import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
 
 import Lib.Utils (counts)
@@ -15,8 +13,7 @@ type Phase = Int
 type Count = Integer
 
 parse :: Text -> Either String Generation
-parse = maybeToEither "Parse fail" .
-  fmap counts . traverse readMaybe . splitOn "," . unpack
+parse = P.parseOnly $ fmap counts $ P.decimal `P.sepBy1'` P.char ','
 
 solveA :: Generation -> Integer
 solveA = populationAfter 80
