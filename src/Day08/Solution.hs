@@ -30,7 +30,10 @@ parse = P.parseOnly $ display `P.sepBy1'` P.endOfLine
     signal = P.many1' $ P.satisfy $ P.inClass "abcdefg"
     
 solveA :: [Display] -> Int
-solveA = undefined
+solveA = sum . fmap (length . filter isIdentifiableDigit . output)
+  where
+    isIdentifiableDigit :: Signal -> Bool
+    isIdentifiableDigit s = length s `elem` [2, 3, 4, 7]
 
 solveB :: [Display] -> Int
 solveB = undefined
