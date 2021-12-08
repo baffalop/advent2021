@@ -24,6 +24,7 @@ import qualified Day07.Solution as Day07
 data Options = Options
   { day :: Day
   , parts :: [DayPart]
+  , submit :: Bool
   , key :: SessionKey
   }
 
@@ -39,13 +40,24 @@ type ParseError = String
 
 main :: IO ()
 main = do
-  options@Options{ day, parts } <- Opt.execParser cli
+  options@Options{ day, parts, submit } <- Opt.execParser cli
+  
   input <- fetchInput options
   case solutionsFor day input of
     Left e -> fail e
     Right (solutionA, solutionB) -> do
       when (PartA `elem` parts) $ putStrLn $ "Part A: " <> solutionA
       when (PartB `elem` parts) $ putStrLn $ "Part B: " <> solutionB
+
+      when submit $ do
+        let (part, solution) = case parts of
+              [PartA] -> (PartA, solutionA)
+              [PartB] -> (PartB, solutionB)
+              _ -> error "Please specify part -a or -b to submit"
+              
+        when (null solution) $ fail "Solution is empty. Will not submit."
+        putStrLn "Submitting..."
+        submitSolution solution part options
 
 solutionsFor :: Day -> Solution
 solutionsFor day = case day of
@@ -77,6 +89,7 @@ opts =
     <*> (buildDayPart
       <$> Opt.switch (short 'a' <> help "Run only part A of the day's solution")
       <*> Opt.switch (short 'b' <> help "Run only part B of the day's solution"))
+    <*> Opt.switch (short 's' <> long "submit" <> help "Submit the computed solution (must specify a part)")
     <*> (Key <$> Opt.strOption (long "key" <> short 'k' <> metavar "KEY" <> help "API session key"))
 
 fetchInput :: Options -> IO Text
@@ -85,6 +98,20 @@ fetchInput Options{ day, key } = do
   case response of
     Left err -> fail $ "Error response from API: " <> show err
     Right input -> pure input
+
+submitSolution :: String -> DayPart -> Options -> IO ()
+submitSolution solution part Options{ day, key } = do
+  let apiDay = Advent.mkDay_ $ toInteger day
+  let apiPart = case part of
+        PartA -> Advent.Part1
+        PartB -> Advent.Part2
+  
+  response <- Advent.runAoC (aocOpts key) $ Advent.AoCSubmit apiDay apiPart solution
+  case response of
+    Left e -> fail $ "Error submitting: " <> show e
+    Right (message, code) -> do
+      print message
+      putStrLn $ "(Code " <> show code <> ")"
 
 dayNumberOpt :: Int -> Opt.ReadM Day
 dayNumberOpt bound =
