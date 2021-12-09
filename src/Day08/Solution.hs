@@ -57,6 +57,8 @@ resolveWirings signals =
   in
   applyExclusions firstPass
 
+{-| Find sets of signals that are all mapped to the same set of outputs (eg. 'a' and 'c' are both possibly [ac])
+  and exclude these sets from the other mappings (eg. 'd' cannot also be 'a' or 'c') -}
 applyExclusions :: Wirings -> Wirings
 applyExclusions wirings =
   let
@@ -69,6 +71,7 @@ applyExclusions wirings =
   in
   (\s -> foldl' Set.difference s $ filter (/= s) exclusiveSets) <$> wirings
 
+{-| Establish possible wirings based on which digits match that number of segments -}
 possibleWirings :: Signal -> Wirings
 possibleWirings signal = fromMaybe Map.empty $ do
   digits <- Map.lookup (length signal) segmentsDigits
