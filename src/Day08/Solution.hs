@@ -1,6 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE NamedFieldPuns #-}
 
 module Day08.Solution (parse, solveA, solveB) where
 
@@ -55,12 +56,12 @@ resolveWirings signals =
     firstPass :: Wirings
     firstPass = Map.unionsWith Set.intersection $ possibleWirings <$> signals
   in
-  applyExclusions firstPass
+  exclude $ foldr deduce (exclude firstPass) signals
 
 {-| Find sets of signals that are all mapped to the same set of outputs (eg. 'a' and 'c' are both possibly [ac])
   and exclude these sets from the other mappings (eg. 'd' cannot also be 'a' or 'c') -}
-applyExclusions :: Wirings -> Wirings
-applyExclusions wirings =
+exclude :: Wirings -> Wirings
+exclude wirings =
   let
     allSets :: [Set Char]
     allSets = snd <$> Map.toList wirings
@@ -69,19 +70,37 @@ applyExclusions wirings =
     exclusiveSets = nub $
       filter (\s -> frequency s allSets == Set.size s) allSets
   in
-  (\s -> foldl' Set.difference s $ filter (/= s) exclusiveSets) <$> wirings
+  fmap (\s -> foldl' Set.difference s $ filter (/= s) exclusiveSets) wirings
+
+deduce :: Signal -> Wirings -> Wirings
+deduce signal wirings =
+  let
+    allSignalPositions :: [Set Char]
+    allSignalPositions = lookupAll signal wirings
+
+    fittingArrangements :: Set Char
+    fittingArrangements = fold
+      $ filter (\s -> not $ any (Set.disjoint s) allSignalPositions)
+      $ possibleArrangements signal
+  in
+  foldr (Map.adjust $ Set.intersection fittingArrangements) wirings signal
 
 {-| Establish possible wirings based on which digits match that number of segments -}
 possibleWirings :: Signal -> Wirings
-possibleWirings signal = fromMaybe Map.empty $ do
-  digits <- Map.lookup (length signal) segmentsDigits
-  let positions = lookupAll digits digitPositions
-  pure $ Map.fromList $ (, positions) <$> signal
+possibleWirings signal =
+  let possibilities = fold $ possibleArrangements signal
+  in Map.fromList $ (, possibilities) <$> signal
+
+possibleArrangements :: Signal -> [Set Char]
+possibleArrangements s = lookupAll (possibleDigits s) digitPositions
+
+possibleDigits :: Signal -> [Digit]
+possibleDigits s = fromMaybe [] $ Map.lookup (length s) segmentsDigits
 
 obviously :: Signal -> Maybe Digit
-obviously s =
-  case Map.lookup (length s) segmentsDigits of
-    Just [d] -> Just d
+obviously signal =
+  case possibleDigits signal of
+    [d] -> Just d
     _ -> Nothing
 
 segmentsDigits :: Map Int [Digit]
@@ -101,8 +120,8 @@ digitPositions = Map.fromList $ bimap Digit Set.fromList <$>
   , (9, "abcdfg")
   ]
 
-lookupAll :: (Ord k, Monoid a) => [k] -> Map k a -> a
-lookupAll xs m = fold $ mapMaybe (`Map.lookup` m) xs
+lookupAll :: Ord k => [k] -> Map k a -> [a]
+lookupAll xs m = mapMaybe (`Map.lookup` m) xs
 
 flipMap :: Ord a => Map k a -> Map a [k]
 flipMap = Map.foldrWithKey (\k a -> Map.insertWith (<>) a [k]) Map.empty
