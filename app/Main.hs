@@ -5,7 +5,6 @@ module Main where
 import Control.Monad (when)
 import Data.Either.Extra (maybeToEither)
 import Data.Maybe (catMaybes)
-import Data.Tuple.Extra (both)
 import Options.Applicative (help, long, metavar, short)
 import Text.Read (readMaybe)
 import qualified Advent
@@ -72,10 +71,10 @@ solutionsFor day = case day of
   8 -> solutions Day08.parse Day08.solveA Day08.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
-solutions :: Show a => (Text -> Either ParseError r) -> (r -> a) -> (r -> a) -> Solution
+solutions :: (Show a, Show b) => (Text -> Either ParseError r) -> (r -> a) -> (r -> b) -> Solution
 solutions parse solveA solveB input = do
   parsed <- parse input
-  pure $ (show . ($ parsed)) `both` (solveA, solveB)
+  pure (show $ solveA parsed, show $ solveB parsed)
 
 cli :: Opt.ParserInfo Options
 cli =
