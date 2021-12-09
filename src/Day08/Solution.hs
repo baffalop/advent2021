@@ -54,18 +54,20 @@ resolveWirings signals =
   let
     firstPass :: Wirings
     firstPass = Map.unionsWith Set.intersection $ possibleWirings <$> signals
-
-    exclusiveSets :: [Set Char] 
-    exclusiveSets = exclusive firstPass
   in
-  fmap (\s -> foldl' Set.difference s $ filter (/= s) exclusiveSets) firstPass
+  applyExclusions firstPass
 
-exclusive :: Wirings -> [Set Char]
-exclusive wirings =
+applyExclusions :: Wirings -> Wirings
+applyExclusions wirings =
   let
+    allSets :: [Set Char]
     allSets = snd <$> Map.toList wirings
+    
+    exclusiveSets :: [Set Char]
+    exclusiveSets = nub $
+      filter (\s -> frequency s allSets == Set.size s) allSets
   in
-  nub $ filter (\s -> length (filter (== s) allSets) == Set.size s) allSets
+  (\s -> foldl' Set.difference s $ filter (/= s) exclusiveSets) <$> wirings
 
 possibleWirings :: Signal -> Wirings
 possibleWirings signal = fromMaybe Map.empty $ do
@@ -101,3 +103,6 @@ lookupAll xs m = fold $ mapMaybe (`Map.lookup` m) xs
 
 flipMap :: Ord a => Map k a -> Map a [k]
 flipMap = Map.foldrWithKey (\k a -> Map.insertWith (<>) a [k]) Map.empty
+
+frequency :: Eq a => a -> [a] -> Int
+frequency x = length . filter (== x)
