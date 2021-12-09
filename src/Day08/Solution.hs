@@ -56,7 +56,8 @@ segmentsDigits = flipMap $ Set.size <$> digitPositions
 
 digitPositions :: Map Digit (Set Char)
 digitPositions = Map.fromList $ bimap Digit Set.fromList <$>
-  [ (1, "ef")
+  [ (0, "abcefg")
+  , (1, "cf")
   , (2, "acdeg")
   , (3, "acdfg")
   , (4, "bcdf")
