@@ -62,28 +62,31 @@ resolveWirings signals =
   and exclude these sets from the other mappings (eg. 'd' cannot also be 'a' or 'c') -}
 exclude :: Wirings -> Wirings
 exclude wirings =
-  let
-    allSets :: [Set Char]
-    allSets = snd <$> Map.toList wirings
-    
-    exclusiveSets :: [Set Char]
-    exclusiveSets = nub $
-      filter (\s -> frequency s allSets == Set.size s) allSets
-  in
-  fmap (\s -> foldl' Set.difference s $ filter (/= s) exclusiveSets) wirings
+  fmap
+    (\s -> foldl' Set.difference s $ filter (/= s) $ exclusiveSets wirings)
+    wirings
 
 deduce :: Signal -> Wirings -> Wirings
 deduce signal wirings =
   let
-    allSignalPositions :: [Set Char]
-    allSignalPositions = lookupAll signal wirings
+    exclusiveForSignal :: [Set Char]
+    exclusiveForSignal =
+      exclusiveSets $ Map.filterWithKey (const . (`elem` signal)) wirings
 
     fittingArrangements :: Set Char
     fittingArrangements = fold
-      $ filter (\s -> not $ any (Set.disjoint s) allSignalPositions)
+      $ filter (\s -> all (`Set.isSubsetOf` s) exclusiveForSignal)
       $ possibleArrangements signal
   in
   foldr (Map.adjust $ Set.intersection fittingArrangements) wirings signal
+
+exclusiveSets :: Wirings -> [Set Char]
+exclusiveSets wirings =
+  let
+    allSets :: [Set Char]
+    allSets = snd <$> Map.toList wirings
+  in
+  filter (\s -> frequency s allSets == Set.size s) allSets
 
 {-| Establish possible wirings based on which digits match that number of segments -}
 possibleWirings :: Signal -> Wirings
