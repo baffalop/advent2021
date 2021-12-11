@@ -5,6 +5,7 @@
 
 module Day08.Solution (parse, solveA, solveB) where
 
+import Data.Function ((&))
 import Data.Maybe (mapMaybe, fromMaybe)
 import Data.Text (Text)
 import Data.Attoparsec.Text (Parser)
@@ -13,7 +14,7 @@ import Data.Set (Set)
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
-import Data.Foldable (fold, Foldable (foldl'))
+import Data.Foldable (fold, Foldable (foldl'), find)
 import Data.Biapplicative (bimap)
 import Data.List (nub)
 
@@ -27,7 +28,7 @@ data Display = Display
   deriving Show
 
 newtype Digit = Digit { fromDigit :: Int }
-  deriving (Eq, Ord)
+  deriving (Eq, Ord, Show)
 
 parse :: Text -> Either String [Display]
 parse = P.parseOnly $ display `P.sepBy1'` P.endOfLine
@@ -47,16 +48,25 @@ parse = P.parseOnly $ display `P.sepBy1'` P.endOfLine
 solveA :: [Display] -> Int
 solveA = sum . fmap (length . mapMaybe obviously . output)
 
-solveB :: [Display] -> [Map Char String]
-solveB = fmap (fmap Set.toList . resolveWirings . inputs)
+solveB :: [Display] -> Int
+solveB = sum . fmap (digitsToInt . (fmap . decode <$> (solveWirings . inputs) <*> output))
 
-resolveWirings :: [Signal] -> Wirings
-resolveWirings signals =
-  let
-    firstPass :: Wirings
-    firstPass = Map.unionsWith Set.intersection $ possibleWirings <$> signals
-  in
-  exclude $ foldr deduce (exclude firstPass) signals
+solveWirings :: [Signal] -> Wirings
+solveWirings signals =
+  possibleWirings <$> signals
+    & Map.unionsWith Set.intersection 
+    & iterate (flip (foldr deduce) signals . exclude)
+    & dropWhile (any $ (> 1) . Set.size)
+    & head
+
+decode :: Wirings -> Signal -> Digit
+decode wirings signal =
+  Map.toList digitPositions
+    & find ((== fold (lookupAll signal wirings)) . snd)
+    & maybe (Digit $ -1) fst
+
+digitsToInt :: [Digit] -> Int
+digitsToInt = foldl' (\s d -> fromDigit d + s * 10) 0
 
 {-| Find sets of signals that are all mapped to the same set of outputs (eg. 'a' and 'c' are both possibly [ac])
   and exclude these sets from the other mappings (eg. 'd' cannot also be 'a' or 'c') -}
@@ -74,9 +84,10 @@ deduce signal wirings =
       exclusiveSets $ Map.filterWithKey (const . (`elem` signal)) wirings
 
     fittingArrangements :: Set Char
-    fittingArrangements = fold
-      $ filter (\s -> all (`Set.isSubsetOf` s) exclusiveForSignal)
-      $ possibleArrangements signal
+    fittingArrangements =
+      possibleArrangements signal
+        & filter (\s -> all (`Set.isSubsetOf` s) exclusiveForSignal)
+        & fold
   in
   foldr (Map.adjust $ Set.intersection fittingArrangements) wirings signal
 
