@@ -33,6 +33,7 @@ library
       Day07.Solution
       Day08.Solution
       Day10.Solution
+      Day12.Solution
       Lib.Utils
   other-modules:
       Paths_advent21
