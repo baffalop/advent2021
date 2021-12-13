@@ -1,16 +1,12 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE NamedFieldPuns #-}
 
 module Day13.Solution (parse, solveA, solveB) where
 
 import Data.Attoparsec.Text (Parser)
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
-import Data.Set (Set)
-import qualified Data.Attoparsec.Text as P
-import qualified Data.Set as Set
-import Data.Tuple.Extra (first, second, both)
 import Data.List (nub, foldl', intercalate)
+import Data.Text (Text)
+import Data.Tuple.Extra (first, second, both)
+import qualified Data.Attoparsec.Text as P
 
 data Origami = Origami
   { plane :: [Coord]
@@ -31,7 +27,8 @@ parse = P.parseOnly $ Origami <$> linesOf coord <* P.skipSpace <*> linesOf fold
     coord = (,) <$> P.decimal <* P.char ',' <*> P.decimal
 
     fold :: Parser Fold
-    fold = (,) <$ P.string "fold along "
+    fold = (,)
+      <$  P.string "fold along "
       <*> P.choice [Horizontal <$ P.char 'x', Vertical <$ P.char 'y']
       <*  P.char '='
       <*> P.decimal
