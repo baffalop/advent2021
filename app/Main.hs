@@ -22,6 +22,7 @@ import qualified Day07.Solution as Day07
 import qualified Day08.Solution as Day08
 import qualified Day10.Solution as Day10
 import qualified Day12.Solution as Day12
+import qualified Day13.Solution as Day13
 
 data Options = Options
   { day :: Day
@@ -73,6 +74,7 @@ solutionsFor day = case day of
   8 -> solutions Day08.parse Day08.solveA Day08.solveB
   10 -> solutions Day10.parse Day10.solveA Day10.solveB
   12 -> solutions Day12.parse Day12.solveA Day12.solveB
+  13 -> solutions Day13.parse Day13.solveA Day13.solveB
   _ -> error $ "Have not solved for Day " <> show day <> " yet"
 
 solutions :: (Show a, Show b) => (Text -> Either ParseError r) -> (r -> a) -> (r -> b) -> Solution

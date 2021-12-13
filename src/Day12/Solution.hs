@@ -1,15 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Day12.Solution where
+module Day12.Solution (parse, solveA, solveB) where
 
-import Data.Text (Text)
 import Data.Attoparsec.Text (Parser)
-import qualified Data.Attoparsec.Text as P
-import qualified Data.Map as Map
-import qualified Data.Char as Char
-import Data.Maybe (fromMaybe)
 import Data.List (nub)
+import Data.Maybe (fromMaybe)
+import Data.Text (Text)
 import Data.Tuple.Extra (second, swap)
+import qualified Data.Attoparsec.Text as P
+import qualified Data.Char as Char
+import qualified Data.Map as Map
 
 type CaveMap = Map.Map Cave [Cave]
 
@@ -22,7 +22,7 @@ data Cave
 
 parse :: Text -> Either String CaveMap
 parse = P.parseOnly $
-  Map.fromListWith (nub ... (<>)) . prepare <$> link `P.sepBy1'` P.endOfLine
+  Map.fromListWith (nub ... (<>)) . bidirectional <$> link `P.sepBy1'` P.endOfLine
   where
     link :: Parser (Cave, Cave)
     link = (,) <$> cave <* P.char '-' <*> cave
@@ -35,8 +35,8 @@ parse = P.parseOnly $
       , Small <$> P.many1' (P.satisfy Char.isLower)
       ]
     
-    prepare :: [(Cave, Cave)] -> [(Cave, [Cave])]
-    prepare = (<>) <$> fmap (second (:[])) <*> fmap (second (:[]) . swap)
+    bidirectional :: [(Cave, Cave)] -> [(Cave, [Cave])]
+    bidirectional = (<>) <$> fmap (second (:[])) <*> fmap (second (:[]) . swap)
 
 solveA :: CaveMap -> Int
 solveA = length . paths (const False)
@@ -45,18 +45,16 @@ solveB :: CaveMap -> Int
 solveB = length . paths ((\p -> nub p == p) . filter isSmall)
 
 paths :: ([Cave] -> Bool) -> CaveMap -> [[Cave]]
-paths canAddSmall map = explore [Start]
+paths canAddSmall map = explore [] Start
   where
-    explore :: [Cave] -> [[Cave]]
-    explore [] = error "Empty path"
-    explore path@(current:prev) =
-      case current of
-        End -> [path]
-        Start | Start `elem` prev -> []
-        c@(Small _) | not (canAddSmall prev) && c `elem` prev -> []
-        c -> fromMaybe []
-          $ foldMap (explore . (: path))
-          <$> Map.lookup c map
+    explore :: [Cave] -> Cave -> [[Cave]]
+    explore path cave = case cave of
+      End -> [End : path]
+      Start | Start `elem` path -> []
+      (Small _) | not (canAddSmall path) && cave `elem` path -> []
+      _ -> fromMaybe []
+        $ foldMap (explore $ cave : path)
+        <$> Map.lookup cave map
 
 isSmall :: Cave -> Bool
 isSmall (Small _) = True
