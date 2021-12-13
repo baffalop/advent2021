@@ -11,6 +11,8 @@ import qualified Data.Attoparsec.Text as P
 import qualified Data.Char as Char
 import qualified Data.Map as Map
 
+import Lib.Utils (frequency)
+
 type CaveMap = Map.Map Cave [Cave]
 
 data Cave
@@ -59,9 +61,6 @@ paths canAddSmall map = explore [] Start
 isSmall :: Cave -> Bool
 isSmall (Small _) = True
 isSmall _ = False
-
-frequency :: Eq a => a -> [a] -> Int
-frequency x = length . filter (== x)
 
 (...) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
 (...) = (.) . (.)

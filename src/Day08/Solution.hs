@@ -77,9 +77,8 @@ exclude wirings =
     (\s -> foldl' Set.difference s $ filter (/= s) $ exclusiveSets wirings)
     wirings
 
-{-| For a given signal, if it contains an exclusive set of wirings, eliminate any possible wirings
-  
-  -}
+{-| For a given signal, if it contains an exclusive set of wirings, the members of that set
+  must be present in the output for that signal. Use this to reduce possible wirings for that signal. -}
 deduce :: Signal -> Wirings -> Wirings
 deduce signal wirings =
   let

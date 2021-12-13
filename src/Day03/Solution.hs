@@ -9,6 +9,8 @@ import Text.Read (readMaybe)
 import Data.Text (Text, unpack)
 import Data.Either.Extra (maybeToEither)
 
+import Lib.Utils (frequency)
+
 type Binary = [Int]
 type Bit = Int
 
@@ -50,6 +52,3 @@ bitFlip = (1 -)
 
 powersOf :: Int -> [Int]
 powersOf x = fmap (x^) [0..]
-
-frequency :: Eq a => a -> [a] -> Int
-frequency x = length . filter (== x)

@@ -25,5 +25,8 @@ safeLast [] = Nothing
 safeLast [x] = Just x
 safeLast (_:xs) = safeLast xs
 
+frequency :: Eq a => a -> [a] -> Int
+frequency x = length . filter (== x)
+
 counts :: (Ord a, Integral n) => [a] -> Map a n
 counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
