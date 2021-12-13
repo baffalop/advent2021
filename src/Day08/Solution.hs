@@ -15,7 +15,6 @@ import qualified Data.Map.Strict as Map
 import qualified Data.Set as Set
 import Data.Foldable (fold, Foldable (foldl'), find)
 import Data.Biapplicative (bimap)
-import Data.List (nub)
 
 import Lib.Utils (frequency)
 
