@@ -39,10 +39,13 @@ parse = P.parseOnly $
     prepare = (<>) <$> fmap (second (:[])) <*> fmap (second (:[]) . swap)
 
 solveA :: CaveMap -> Int
-solveA = length . paths
+solveA = length . paths (const False)
 
-paths :: CaveMap -> [[Cave]]
-paths map = explore [Start]
+solveB :: CaveMap -> Int 
+solveB = length . paths ((\p -> nub p == p) . filter isSmall)
+
+paths :: ([Cave] -> Bool) -> CaveMap -> [[Cave]]
+paths canAddSmall map = explore [Start]
   where
     explore :: [Cave] -> [[Cave]]
     explore [] = error "Empty path"
@@ -50,13 +53,14 @@ paths map = explore [Start]
       case current of
         End -> [path]
         Start | Start `elem` prev -> []
-        c@(Small _) | c `elem` prev -> []
+        c@(Small _) | not (canAddSmall prev) && c `elem` prev -> []
         c -> fromMaybe []
           $ foldMap (explore . (: path))
           <$> Map.lookup c map
 
-solveB :: CaveMap -> Int 
-solveB = undefined
+isSmall :: Cave -> Bool
+isSmall (Small _) = True
+isSmall _ = False
 
 frequency :: Eq a => a -> [a] -> Int
 frequency x = length . filter (== x)
