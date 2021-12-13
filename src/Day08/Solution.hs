@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TupleSections #-}
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE NamedFieldPuns #-}
 
 module Day08.Solution (parse, solveA, solveB) where
 
@@ -17,6 +16,8 @@ import qualified Data.Set as Set
 import Data.Foldable (fold, Foldable (foldl'), find)
 import Data.Biapplicative (bimap)
 import Data.List (nub)
+
+import Lib.Utils (frequency)
 
 type Signal = String
 type Wirings = Map Char (Set Char)
@@ -142,6 +143,3 @@ lookupAll xs m = mapMaybe (`Map.lookup` m) xs
 
 flipMap :: Ord a => Map k a -> Map a [k]
 flipMap = Map.foldrWithKey (\k a -> Map.insertWith (<>) a [k]) Map.empty
-
-frequency :: Eq a => a -> [a] -> Int
-frequency x = length . filter (== x)
