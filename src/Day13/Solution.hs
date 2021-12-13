@@ -9,8 +9,8 @@ import Data.Text (Text)
 import Data.Set (Set)
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Set as Set
-import Data.Tuple.Extra (first, second)
-import Data.List (nub)
+import Data.Tuple.Extra (first, second, both)
+import Data.List (nub, foldl', intercalate)
 
 data Origami = Origami
   { plane :: [Coord]
@@ -35,12 +35,15 @@ parse = P.parseOnly $ Origami <$> linesOf coord <* P.skipSpace <*> linesOf fold
       <*> P.choice [Horizontal <$ P.char 'x', Vertical <$ P.char 'y']
       <*  P.char '='
       <*> P.decimal
-    
+
     linesOf :: Parser a -> Parser [a]
-    linesOf p = p `P.sepBy1'` P.endOfLine 
+    linesOf p = p `P.sepBy1'` P.endOfLine
 
 solveA :: Origami -> Int
 solveA = length . (foldAlong <$> (head . folds) <*> plane)
+
+solveB :: Origami -> String
+solveB = render . (foldl' (flip foldAlong) <$> plane <*> folds)
 
 foldAlong :: Fold -> [Coord] -> [Coord]
 foldAlong (axis, n) = nub . fmap fold
@@ -54,5 +57,10 @@ foldAlong (axis, n) = nub . fmap fold
       Horizontal -> (fst, first)
       Vertical -> (snd, second)
 
-solveB :: Origami -> Int
-solveB = undefined
+render :: [Coord] -> String
+render plane = intercalate "\n"
+  [ [ if (x, y) `elem` plane then '#' else '.'
+      | x <- [0..maxX]
+    ] | y <- [0..maxY]
+  ]
+  where (maxX, maxY) = (maximum . (<$> plane)) `both` (fst, snd)
