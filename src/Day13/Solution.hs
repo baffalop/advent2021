@@ -9,25 +9,24 @@ import Data.Text (Text)
 import Data.Set (Set)
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Set as Set
+import Data.Tuple.Extra (first, second)
+import Data.List (nub)
 
 data Origami = Origami
-  { plane :: Set Coord
+  { plane :: [Coord]
   , folds :: [Fold]
   }
   deriving (Show)
 
 type Coord = (Int, Int)
-type Fold = (Orientation, Int)
+type Fold = (Axis, Int)
 
-data Orientation = Horizontal | Vertical
+data Axis = Horizontal | Vertical
   deriving (Show)
 
 parse :: Text -> Either String Origami
-parse = P.parseOnly $ Origami <$> plane <* P.skipSpace <*> linesOf fold
+parse = P.parseOnly $ Origami <$> linesOf coord <* P.skipSpace <*> linesOf fold
   where
-    plane :: Parser (Set Coord)
-    plane = Set.fromList <$> linesOf coord
-    
     coord :: Parser Coord
     coord = (,) <$> P.decimal <* P.char ',' <*> P.decimal
 
@@ -40,8 +39,20 @@ parse = P.parseOnly $ Origami <$> plane <* P.skipSpace <*> linesOf fold
     linesOf :: Parser a -> Parser [a]
     linesOf p = p `P.sepBy1'` P.endOfLine 
 
-solveA :: Origami -> Origami
-solveA = id
+solveA :: Origami -> Int
+solveA = length . (foldAlong <$> (head . folds) <*> plane)
+
+foldAlong :: Fold -> [Coord] -> [Coord]
+foldAlong (axis, n) = nub . fmap fold
+  where
+    fold :: Coord -> Coord
+    fold c = if pick c < n then c else put ((+ n * 2) . negate) c
+
+    pick :: Coord -> Int
+    put :: (Int -> Int) -> Coord -> Coord
+    (pick, put) = case axis of
+      Horizontal -> (fst, first)
+      Vertical -> (snd, second)
 
 solveB :: Origami -> Int
 solveB = undefined
