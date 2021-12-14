@@ -1,11 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE TupleSections #-}
 
 module Day14.Solution where
 
 import Data.Attoparsec.Text (Parser)
-import Data.List (intersperse)
+import Data.Bifunctor (second)
+import Data.Function ((&))
 import Data.Map.Strict (Map)
+import Data.Maybe (mapMaybe)
 import Data.MultiSet (MultiSet)
 import Data.Text (Text)
 import qualified Data.Attoparsec.Text as P
@@ -22,6 +25,11 @@ data Polymer = Polymer
   }
   deriving (Show)
 
+data Process = Process
+  { elements :: MultiSet Char
+  , next :: MultiSet String
+  }
+
 parse :: Text -> Either String Polymer
 parse = P.parseOnly $ Polymer
   <$> word
@@ -35,44 +43,53 @@ parse = P.parseOnly $ Polymer
     word = P.many1' P.letter
 
 solveA :: Polymer -> Int
-solveA Polymer{ template, insertions } =
+solveA p@Polymer{ template, insertions } =
   let
     resultCounts :: [Int]
     resultCounts =
-      fmap snd $ MS.toOccurList $ MS.fromList
-        $ iterate (insertWith insertions) template !! 10
+      iterate (insertWith insertions) (initialise p) !! 10
+        & elements & MS.toOccurList & fmap snd
   in
   maximum resultCounts - minimum resultCounts
 
-insertWith :: Map String Char -> String -> String
-insertWith insertions = foldMap insert . pairs
-  where
-    insert :: String -> String
-    insert p = maybe p (`intersperse` p) $ Map.lookup p insertions
+initialise :: Polymer -> Process
+initialise Polymer{ template, insertions } =
+  Process
+    { elements = MS.fromList template
+    , next = MS.fromList $ pairs template
+    }
+
+insertWith :: Insertions -> Process -> Process
+insertWith insertions Process{ elements, next } =
+  let
+    addedElements :: [(Char, Int)]
+    subsequent :: [(String, Int)]
+    (addedElements, subsequent) =
+      MS.toOccurList next
+        & mapMaybe (\(i, n) -> (,n) <$> expandWith insertions i)
+        & unzipWithOccurs
+        & second (foldMap unpackOccurs)
+  in
+  Process
+    { elements = MS.union elements $ MS.fromOccurList addedElements
+    , next = MS.fromOccurList subsequent
+    }
+
+expandWith :: Insertions -> String -> Maybe (Char, [String])
+expandWith insertions s@[x, y] = do
+  inserted <- Map.lookup s insertions
+  let next = filter (`Map.member` insertions) [[x, inserted], [inserted, y]]
+  pure (inserted, next)
+expandWith _ _ = Nothing
+
+unzipWithOccurs :: [((a, b), Int)] -> ([(a, Int)], [(b, Int)])
+unzipWithOccurs = unzip . fmap (\((x, y), n) -> ((x, n), (y, n)))
+
+unpackOccurs :: ([a], Int) -> [(a, Int)]
+unpackOccurs (xs, n) = (,n) <$> xs
 
 pairs :: [a] -> [[a]]
 pairs = withConsecutive (\x y -> [x, y])
 
 solveB :: Polymer -> Int
 solveB = undefined
-
-example :: Text
-example =
-  "NNCB\n\
-  \\n\
-  \CH -> B\n\
-  \HH -> N\n\
-  \CB -> H\n\
-  \NH -> C\n\
-  \HB -> C\n\
-  \HC -> B\n\
-  \HN -> C\n\
-  \NN -> C\n\
-  \BH -> H\n\
-  \NC -> B\n\
-  \NB -> B\n\
-  \BN -> B\n\
-  \BB -> N\n\
-  \BC -> B\n\
-  \CC -> N\n\
-  \CN -> C"
