@@ -28,6 +28,7 @@ dependencies:
 - bifunctors
 - transformers
 - attoparsec
+- multiset
   
 library:
   source-dirs: src
