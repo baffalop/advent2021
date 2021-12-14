@@ -5,12 +5,13 @@
 module Day14.Solution where
 
 import Data.Attoparsec.Text (Parser)
-import Data.Bifunctor (second)
+import Data.Bifunctor (second, bimap)
 import Data.Function ((&))
 import Data.Map.Strict (Map)
 import Data.Maybe (mapMaybe)
 import Data.MultiSet (MultiSet)
 import Data.Text (Text)
+import Data.Tuple.Extra (both)
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
 import qualified Data.MultiSet as MS
@@ -72,8 +73,8 @@ insertWith rules Process{ elements, next } =
     subsequent :: [(String, Int)]
     (addedElements, subsequent) =
       MS.toOccurList next
-        & mapMaybe (\(i, n) -> (,n) <$> expandWith rules i)
-        & unzipWithOccurs
+        & mapMaybe (\(i, n) -> bimap (,n) (,n) <$> expandWith rules i)
+        & unzip
         & second (foldMap unpackOccurs)
   in
   Process
@@ -87,9 +88,6 @@ expandWith rules s@[x, y] = do
   let next = filter (`Map.member` rules) [[x, inserted], [inserted, y]]
   pure (inserted, next)
 expandWith _ _ = Nothing
-
-unzipWithOccurs :: [((a, b), Int)] -> ([(a, Int)], [(b, Int)])
-unzipWithOccurs = unzip . fmap (\((x, y), n) -> ((x, n), (y, n)))
 
 unpackOccurs :: ([a], Int) -> [(a, Int)]
 unpackOccurs (xs, n) = (,n) <$> xs
