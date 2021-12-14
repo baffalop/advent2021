@@ -1,6 +1,8 @@
 module Lib.Utils where
 
 import Data.Map.Strict (Map)
+import Data.Attoparsec.Text (Parser)
+import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
 
 maybeIf :: Bool -> a -> Maybe a
@@ -30,3 +32,6 @@ frequency x = length . filter (== x)
 
 counts :: (Ord a, Integral n) => [a] -> Map a n
 counts = foldr (flip (Map.insertWith (+)) 1) Map.empty
+
+linesOf :: Parser a -> Parser [a]
+linesOf = (`P.sepBy1'` P.endOfLine)

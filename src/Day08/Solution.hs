@@ -16,7 +16,7 @@ import qualified Data.Set as Set
 import Data.Foldable (fold, Foldable (foldl'), find)
 import Data.Biapplicative (bimap)
 
-import Lib.Utils (frequency)
+import Lib.Utils (frequency, linesOf)
 
 type Signal = String
 type Wirings = Map Char (Set Char)
@@ -31,14 +31,12 @@ newtype Digit = Digit { fromDigit :: Int }
   deriving (Eq, Ord, Show)
 
 parse :: Text -> Either String [Display]
-parse = P.parseOnly $ display `P.sepBy1'` P.endOfLine
+parse = P.parseOnly $ linesOf $
+  Display
+    <$> signals
+    <*  P.string " | "
+    <*> signals
   where
-    display :: Parser Display
-    display = Display
-      <$> signals
-      <*  P.string " | "
-      <*> signals
-
     signals :: Parser [Signal]
     signals = signal `P.sepBy1'` P.char ' '
 

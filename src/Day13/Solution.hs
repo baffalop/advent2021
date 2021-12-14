@@ -8,6 +8,8 @@ import Data.Text (Text)
 import Data.Tuple.Extra (first, second, both)
 import qualified Data.Attoparsec.Text as P
 
+import Lib.Utils (linesOf)
+
 data Origami = Origami
   { plane :: [Coord]
   , folds :: [Fold]
@@ -32,9 +34,6 @@ parse = P.parseOnly $ Origami <$> linesOf coord <* P.skipSpace <*> linesOf fold
       <*> P.choice [Horizontal <$ P.char 'x', Vertical <$ P.char 'y']
       <*  P.char '='
       <*> P.decimal
-
-    linesOf :: Parser a -> Parser [a]
-    linesOf p = p `P.sepBy1'` P.endOfLine
 
 solveA :: Origami -> Int
 solveA = length . (foldAlong <$> (head . folds) <*> plane)

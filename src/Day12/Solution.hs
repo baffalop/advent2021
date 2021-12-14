@@ -11,7 +11,7 @@ import qualified Data.Attoparsec.Text as P
 import qualified Data.Char as Char
 import qualified Data.Map as Map
 
-import Lib.Utils (frequency)
+import Lib.Utils (frequency, linesOf)
 
 type CaveMap = Map.Map Cave [Cave]
 
@@ -24,7 +24,7 @@ data Cave
 
 parse :: Text -> Either String CaveMap
 parse = P.parseOnly $
-  Map.fromListWith (nub ... (<>)) . bidirectional <$> link `P.sepBy1'` P.endOfLine
+  Map.fromListWith (nub ... (<>)) . bidirectional <$> linesOf link
   where
     link :: Parser (Cave, Cave)
     link = (,) <$> cave <* P.char '-' <*> cave

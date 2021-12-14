@@ -16,7 +16,7 @@ import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
 import qualified Data.MultiSet as MS
 
-import Lib.Utils (withConsecutive)
+import Lib.Utils (withConsecutive, linesOf)
 
 type Rules = Map String Char
 
@@ -35,7 +35,7 @@ parse :: Text -> Either String Polymer
 parse = P.parseOnly $ Polymer
   <$> word
   <*  P.skipSpace
-  <*> (Map.fromList <$> rule `P.sepBy1'` P.endOfLine)
+  <*> (Map.fromList <$> linesOf rule)
   where
     rule :: Parser (String, Char)
     rule = (,) <$> word <* P.string " -> " <*> P.letter
