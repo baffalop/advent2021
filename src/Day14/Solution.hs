@@ -43,11 +43,17 @@ parse = P.parseOnly $ Polymer
     word = P.many1' P.letter
 
 solveA :: Polymer -> Int
-solveA p@Polymer{ template, insertions } =
+solveA = solve 10
+
+solveB :: Polymer -> Int
+solveB = solve 40
+
+solve :: Int -> Polymer -> Int
+solve n p@Polymer{ template, insertions } =
   let
     resultCounts :: [Int]
     resultCounts =
-      iterate (insertWith insertions) (initialise p) !! 10
+      iterate (insertWith insertions) (initialise p) !! n
         & elements & MS.toOccurList & fmap snd
   in
   maximum resultCounts - minimum resultCounts
@@ -90,6 +96,3 @@ unpackOccurs (xs, n) = (,n) <$> xs
 
 pairs :: [a] -> [[a]]
 pairs = withConsecutive (\x y -> [x, y])
-
-solveB :: Polymer -> Int
-solveB = undefined
