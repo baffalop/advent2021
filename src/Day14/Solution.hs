@@ -17,11 +17,11 @@ import qualified Data.MultiSet as MS
 
 import Lib.Utils (withConsecutive)
 
-type Insertions = Map String Char
+type Rules = Map String Char
 
 data Polymer = Polymer
   { template :: String
-  , insertions :: Insertions
+  , rules :: Rules
   }
   deriving (Show)
 
@@ -49,30 +49,30 @@ solveB :: Polymer -> Int
 solveB = solve 40
 
 solve :: Int -> Polymer -> Int
-solve n p@Polymer{ template, insertions } =
+solve n p@Polymer{ template, rules } =
   let
     resultCounts :: [Int]
     resultCounts =
-      iterate (insertWith insertions) (initialise p) !! n
+      iterate (insertWith rules) (initialise p) !! n
         & elements & MS.toOccurList & fmap snd
   in
   maximum resultCounts - minimum resultCounts
 
 initialise :: Polymer -> Process
-initialise Polymer{ template, insertions } =
+initialise Polymer{ template, rules } =
   Process
     { elements = MS.fromList template
     , next = MS.fromList $ pairs template
     }
 
-insertWith :: Insertions -> Process -> Process
-insertWith insertions Process{ elements, next } =
+insertWith :: Rules -> Process -> Process
+insertWith rules Process{ elements, next } =
   let
     addedElements :: [(Char, Int)]
     subsequent :: [(String, Int)]
     (addedElements, subsequent) =
       MS.toOccurList next
-        & mapMaybe (\(i, n) -> (,n) <$> expandWith insertions i)
+        & mapMaybe (\(i, n) -> (,n) <$> expandWith rules i)
         & unzipWithOccurs
         & second (foldMap unpackOccurs)
   in
@@ -81,10 +81,10 @@ insertWith insertions Process{ elements, next } =
     , next = MS.fromOccurList subsequent
     }
 
-expandWith :: Insertions -> String -> Maybe (Char, [String])
-expandWith insertions s@[x, y] = do
-  inserted <- Map.lookup s insertions
-  let next = filter (`Map.member` insertions) [[x, inserted], [inserted, y]]
+expandWith :: Rules -> String -> Maybe (Char, [String])
+expandWith rules s@[x, y] = do
+  inserted <- Map.lookup s rules
+  let next = filter (`Map.member` rules) [[x, inserted], [inserted, y]]
   pure (inserted, next)
 expandWith _ _ = Nothing
 
