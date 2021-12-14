@@ -11,7 +11,6 @@ import Data.Map.Strict (Map)
 import Data.Maybe (mapMaybe)
 import Data.MultiSet (MultiSet)
 import Data.Text (Text)
-import Data.Tuple.Extra (both)
 import qualified Data.Attoparsec.Text as P
 import qualified Data.Map.Strict as Map
 import qualified Data.MultiSet as MS
@@ -74,7 +73,7 @@ insertWith rules Process{ elements, next } =
     (addedElements, subsequent) =
       MS.toOccurList next
         & mapMaybe (\(i, n) -> bimap (,n) (,n) <$> expandWith rules i)
-        & unzip & second (foldMap unpackOccurs)
+        & unzip & second (foldMap rewrap)
   in
   Process
     { elements = MS.union elements $ MS.fromOccurList addedElements
@@ -88,8 +87,8 @@ expandWith rules s@[x, y] = do
   pure (inserted, next)
 expandWith _ _ = Nothing
 
-unpackOccurs :: ([a], Int) -> [(a, Int)]
-unpackOccurs (xs, n) = (,n) <$> xs
+rewrap :: ([a], b) -> [(a, b)]
+rewrap (xs, y) = (,y) <$> xs
 
 pairs :: [a] -> [[a]]
 pairs = withConsecutive (\x y -> [x, y])
