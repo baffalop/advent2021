@@ -50,17 +50,17 @@ solveB :: Polymer -> Int
 solveB = solve 40
 
 solve :: Int -> Polymer -> Int
-solve n p@Polymer{ template, rules } =
+solve n Polymer{ template, rules } =
   let
     resultCounts :: [Int]
     resultCounts =
-      iterate (insertWith rules) (initialise p) !! n
+      iterate (insertWith rules) (initialise template) !! n
         & elements & MS.toOccurList & fmap snd
   in
   maximum resultCounts - minimum resultCounts
 
-initialise :: Polymer -> Process
-initialise Polymer{ template, rules } =
+initialise :: String -> Process
+initialise template =
   Process
     { elements = MS.fromList template
     , next = MS.fromList $ pairs template
