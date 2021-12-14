@@ -74,8 +74,7 @@ insertWith rules Process{ elements, next } =
     (addedElements, subsequent) =
       MS.toOccurList next
         & mapMaybe (\(i, n) -> bimap (,n) (,n) <$> expandWith rules i)
-        & unzip
-        & second (foldMap unpackOccurs)
+        & unzip & second (foldMap unpackOccurs)
   in
   Process
     { elements = MS.union elements $ MS.fromOccurList addedElements
